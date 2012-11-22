@@ -1,15 +1,14 @@
 import qbs.base 1.0
 
-Product {
-    type: "staticlibrary"
+StaticLibrary {
     name: "visualization"
     files: [ 
         "src/stdafx.h",
-        "src/visualization/drawer_impl.cpp",
-        "src/visualization/printer_impl.cpp",
-        "src/visualization/main_window.cpp",
-        "src/visualization/visualization.cpp",
-        "src/visualization/draw_util.cpp", 
+        "src/visualization/drawer_impl.h",
+        "src/visualization/main_window.h",
+        "src/visualization/main_window_impl.h",
+        "src/visualization/visualization.h",
+        "src/visualization/draw_util.h", 
     ]
 
     Depends { name: "cpp" }
@@ -21,6 +20,7 @@ Product {
         "../arithmetic/include",
         "../geom-primitives/include",
     ]
+    cpp.precompiledHeader: "src/stdafx.h"
 
     Depends { name: "Qt"; submodules: ["core", "gui", "opengl"] }        
 
