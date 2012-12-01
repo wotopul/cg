@@ -1,53 +1,34 @@
 #pragma once
 
-#include "visualization/viewer.h"
+#include "viewer_widget_impl.h"
 
-#include "drawer_impl.h"
-#include "geom/primitives/rectangle.h"
-
-using namespace visualization;
+#include <QVBoxLayout>
 
 template<class ArithmeticTraits>
-struct main_window_t : QGLWidget
+struct main_window_type : QWidget
 {
-public:
-    typedef viewer_type<ArithmeticTraits>                   viewer_t;
-    main_window_t(viewer_t * viewer);
+    typedef viewer_type<ArithmeticTraits> viewer_t;
+
+    explicit main_window_type(viewer_t * viewer);
 
 private:
-    typedef geom::structures::point_type<ArithmeticTraits>      point_t;
-    typedef geom::structures::vector_type<ArithmeticTraits>     vector_t;
-    typedef geom::structures::rectangle_type<ArithmeticTraits>  rectangle_t;
-
-    typedef drawer_impl<ArithmeticTraits> drawer_t;
-private:
-    void initializeGL();
-    void resizeGL(int, int);
-    void paintGL();
-
-    void wheelEvent(QWheelEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseDoubleClickEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-
-    void resize_impl(int, int);
-    point_t screen_to_global(QPoint const & screen_pos) const;
+    typedef viewer_widget_type<ArithmeticTraits> viewer_widget_t;
 
 private:
-    void draw_string(int x, int y, const char * s);
-    void draw_string_global(int, int, const char * s);
-
-private:
-    viewer_t * viewer_;
-
-    rectangle_t         viewport_;
-    point_t             current_pos_;
-    point_t             center_;
-    float               zoom_;
-
-    optional<QPoint>    start_point_;
-
-    drawer_t            drawer_;
+    viewer_widget_t * viewer_widget_;
+    QTextEdit       * text_field_;
 };
+
+template<class Traits>
+main_window_type<Traits>::main_window_type(viewer_t * viewer)
+{
+    text_field_     = new QTextEdit(this);
+    text_field_->setReadOnly(true);
+
+    viewer_widget_  = new viewer_widget_t(this, text_field_, viewer);
+
+    auto layout = new QVBoxLayout(this);
+    layout->addWidget(text_field_,      1 );
+    layout->addWidget(viewer_widget_,   10);
+    setLayout(layout);
+}

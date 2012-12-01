@@ -6,7 +6,8 @@ StaticLibrary {
         "src/stdafx.h",
         "src/visualization/drawer_impl.h",
         "src/visualization/main_window.h",
-        "src/visualization/main_window_impl.h",
+        "src/visualization/viewer_widget.h",
+        "src/visualization/viewer_widget_impl.h",
         "src/visualization/visualization.h",
         "src/visualization/draw_util.h", 
     ]

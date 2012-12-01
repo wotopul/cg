@@ -1,6 +1,8 @@
-#include "stdafx.h"
+#pragma once
 
-#include "main_window.h"
+#include "viewer_widget.h"
+
+#include <boost/format.hpp>
 
 #include "io/point.h"
 #include "geom/primitives/rectangle.h"
@@ -8,16 +10,19 @@
 #include "drawer_impl.h"
 
 template<class Traits>
-main_window_t<Traits>::main_window_t(viewer_t * viewer)
-    : viewer_(viewer)
+viewer_widget_type<Traits>::viewer_widget_type(QWidget * parent, QTextEdit * text_field, viewer_t * viewer)
+    : QGLWidget(parent)
+    , viewer_(viewer)
+    , text_field_(text_field)
     , zoom_(1.0)
 {
     setMouseTracking(true);
     viewer_->draw(drawer_);
+    update_text_field(true);
 }
 
 template<class Traits>
-void main_window_t<Traits>::initializeGL()
+void viewer_widget_type<Traits>::initializeGL()
 {
     assert(doubleBuffer());
     setAutoBufferSwap(true);
@@ -25,7 +30,7 @@ void main_window_t<Traits>::initializeGL()
 }
 
 template<class Traits>
-void main_window_t<Traits>::resize_impl(int screen_w, int screen_h)
+void viewer_widget_type<Traits>::resize_impl(int screen_w, int screen_h)
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -40,13 +45,13 @@ void main_window_t<Traits>::resize_impl(int screen_w, int screen_h)
 }
 
 template<class Traits>
-void main_window_t<Traits>::resizeGL(int screen_w, int screen_h)
+void viewer_widget_type<Traits>::resizeGL(int screen_w, int screen_h)
 {
     resize_impl(screen_w, screen_h);
 }
 
 template<class Traits>
-void main_window_t<Traits>::paintGL()
+void viewer_widget_type<Traits>::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -76,13 +81,10 @@ void main_window_t<Traits>::paintGL()
         
         glDisableClientState(GL_VERTEX_ARRAY);
     }
-
-    //printer.corner_stream() << "Mouse pos: " << current_pos_ << endl;
-    //viewer_->print(printer);
 }
 
 template<class Traits>
-void main_window_t<Traits>::wheelEvent(QWheelEvent * e)
+void viewer_widget_type<Traits>::wheelEvent(QWheelEvent * e)
 {
     float new_zoom = zoom_ * std::pow(1.1f, e->delta() / 8 / 15);
 
@@ -111,7 +113,7 @@ void main_window_t<Traits>::wheelEvent(QWheelEvent * e)
 }
 
 template<class Traits>
-void main_window_t<Traits>::mousePressEvent(QMouseEvent * e)
+void viewer_widget_type<Traits>::mousePressEvent(QMouseEvent * e)
 {
     if (e->button() == Qt::LeftButton && e->modifiers() == Qt::NoModifier)
         start_point_ = e->pos();
@@ -121,6 +123,7 @@ void main_window_t<Traits>::mousePressEvent(QMouseEvent * e)
         {
             drawer_.clear();
             viewer_->draw(drawer_);
+            update_text_field(true);
             updateGL();
         }
     }
@@ -128,7 +131,7 @@ void main_window_t<Traits>::mousePressEvent(QMouseEvent * e)
 }
 
 template<class Traits>
-void main_window_t<Traits>::mouseMoveEvent(QMouseEvent * e)
+void viewer_widget_type<Traits>::mouseMoveEvent(QMouseEvent * e)
 {
     current_pos_ = screen_to_global(e->pos());
 
@@ -161,13 +164,17 @@ void main_window_t<Traits>::mouseMoveEvent(QMouseEvent * e)
     {
         drawer_.clear();
         viewer_->draw(drawer_);
+        update_text_field(true);
     }
+    else
+        update_text_field(false);
+
     e->accept();
     updateGL();
 }
 
 template<class Traits>
-void main_window_t<Traits>::mouseReleaseEvent(QMouseEvent * e)
+void viewer_widget_type<Traits>::mouseReleaseEvent(QMouseEvent * e)
 {
     if (e->button() == Qt::LeftButton)
         start_point_ = boost::none;
@@ -175,24 +182,26 @@ void main_window_t<Traits>::mouseReleaseEvent(QMouseEvent * e)
     {
         drawer_.clear();
         viewer_->draw(drawer_);
+        update_text_field(true);
         updateGL();
     }
     e->accept();
 }
 
 template<class Traits>
-void main_window_t<Traits>::mouseDoubleClickEvent(QMouseEvent * event)
+void viewer_widget_type<Traits>::mouseDoubleClickEvent(QMouseEvent * event)
 {
     if (viewer_->on_double_click(screen_to_global(event->pos())))
     {
         drawer_.clear();
         viewer_->draw(drawer_);
+        update_text_field(true);
         updateGL();
     }
 }
 
 template<class Traits>
-void main_window_t<Traits>::keyReleaseEvent(QKeyEvent * event)
+void viewer_widget_type<Traits>::keyReleaseEvent(QKeyEvent * event)
 {
     if ((event->key() == Qt::Key_C) && (event->modifiers() == Qt::ControlModifier))
     {
@@ -215,17 +224,37 @@ void main_window_t<Traits>::keyReleaseEvent(QKeyEvent * event)
     {
         drawer_.clear();
         viewer_->draw(drawer_);
+        update_text_field(true);
         updateGL();
     }
     event->accept();
 }
 
 template<class Traits>
-typename main_window_t<Traits>::point_t 
-    main_window_t<Traits>::screen_to_global(QPoint const & screen_pos) const
+typename viewer_widget_type<Traits>::point_t 
+    viewer_widget_type<Traits>::screen_to_global(QPoint const & screen_pos) const
 {
     return point_t (
         center_.x + zoom_ * (screen_pos.x() - width() / 2),
         center_.y + zoom_ * (height() / 2 - screen_pos.y())
     );
 }
+
+template<class Traits>
+void viewer_widget_type<Traits>::update_text_field(bool update_user_text)
+{
+    if (update_user_text)
+    {
+        std::ostringstream oss;
+        viewer_->print(oss);
+        user_text_ = oss.str();
+    }
+
+    text_field_->clear();
+
+    text_field_->setTextColor(Qt::blue);
+    text_field_->append(QString::fromStdString(str(boost::format("Mouse pos: %1%") % current_pos_)));
+    text_field_->setTextColor(Qt::black);
+    text_field_->append(QString::fromStdString(user_text_));
+}
+
