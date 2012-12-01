@@ -14,11 +14,11 @@ struct drawer_impl : drawer_type<ArithmeticTraits>
     typedef typename base_t::segment_type   segment_t;
     typedef typename base_t::point_type     point_t;
 
-    void set_color(QColor const & c)                                    override;
+    virtual void set_color(QColor const & c)                                    override;
 
-    void draw_line(segment_t const &,                   float width)    override;
-    void draw_line(point_t const &, point_t const &,    float width)    override;
-    void draw_point(point_t const & pt,                 float radius)   override;
+    virtual void draw_line(segment_t const &,                   float width)    override;
+    virtual void draw_line(point_t const &, point_t const &,    float width)    override;
+    virtual void draw_point(point_t const & pt,                 float radius)   override;
 
     drawer_impl()
         : current_color_ (Qt::black)

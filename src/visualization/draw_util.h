@@ -26,7 +26,7 @@ namespace visualization
     }
 
     template<class Traits>
-    void draw(drawer_type<Traits> & drawer, geom::structures::contour_type<Traits>   const & cnt, bool draw_vertices = false)
+    void draw(drawer_type<Traits> & drawer, geom::structures::contour_type<Traits>   const & cnt, bool draw_vertices)
     {
         geom::structures::contour_circulator<Traits> beg(cnt), it = beg;
 
