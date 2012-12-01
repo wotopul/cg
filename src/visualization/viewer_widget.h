@@ -10,12 +10,16 @@ using namespace visualization;
 template<class ArithmeticTraits>
 struct viewer_widget_type : QGLWidget
 {
-    typedef viewer_type<ArithmeticTraits> viewer_t;
+    typedef viewer_type<ArithmeticTraits>                   viewer_t;
+    typedef geom::structures::point_type<ArithmeticTraits>  point_t;
 
     viewer_widget_type(QWidget * parent, QTextEdit * text_field, viewer_t * viewer);
 
+    point_t const & current_pos() const;
+
+    void repaint();
+
 private:
-    typedef geom::structures::point_type<ArithmeticTraits>      point_t;
     typedef geom::structures::vector_type<ArithmeticTraits>     vector_t;
     typedef geom::structures::rectangle_type<ArithmeticTraits>  rectangle_t;
 
@@ -30,7 +34,6 @@ private:
     void mouseDoubleClickEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
-    void keyReleaseEvent(QKeyEvent *);
 
     void resize_impl(int, int);
     point_t screen_to_global(QPoint const & screen_pos) const;

@@ -201,36 +201,6 @@ void viewer_widget_type<Traits>::mouseDoubleClickEvent(QMouseEvent * event)
 }
 
 template<class Traits>
-void viewer_widget_type<Traits>::keyReleaseEvent(QKeyEvent * event)
-{
-    if ((event->key() == Qt::Key_C) && (event->modifiers() == Qt::ControlModifier))
-    {
-        //std::stringstream ss;
-        //ss << QInputDialog::getText(this, "center selection", "type point: ").toStdString();
-        //point_t old_pos = current_pos_;
-        //ss >> current_pos_;
-
-        //center_ += (current_pos_ - old_pos);
-
-        //resize_impl(size().width(), size().height());
-        //updateGL();
-    }
-    else if ((event->key() == Qt::Key_I) && (event->modifiers() == Qt::ControlModifier))
-    {
-        auto txt = boost::lexical_cast<std::string>(current_pos_); 
-        QApplication::clipboard()->setText(txt.c_str());
-    }
-    else if (viewer_->on_key(event->key()))
-    {
-        drawer_.clear();
-        viewer_->draw(drawer_);
-        update_text_field(true);
-        updateGL();
-    }
-    event->accept();
-}
-
-template<class Traits>
 typename viewer_widget_type<Traits>::point_t 
     viewer_widget_type<Traits>::screen_to_global(QPoint const & screen_pos) const
 {
@@ -256,5 +226,21 @@ void viewer_widget_type<Traits>::update_text_field(bool update_user_text)
     text_field_->append(QString::fromStdString(str(boost::format("Mouse pos: %1%") % current_pos_)));
     text_field_->setTextColor(Qt::black);
     text_field_->append(QString::fromStdString(user_text_));
+}
+
+template<class Traits>
+void viewer_widget_type<Traits>::repaint()
+{
+    drawer_.clear();
+    viewer_->draw(drawer_);
+    update_text_field(true);
+    updateGL();
+}
+
+template<class Traits>
+typename viewer_widget_type<Traits>::point_t const & 
+    viewer_widget_type<Traits>::current_pos() const
+{
+    return current_pos_;
 }
 
