@@ -4,27 +4,34 @@ StaticLibrary {
     name: "visualization"
     files: [ 
         "src/stdafx.h",
-        "src/visualization/drawer_impl.h",
-        "src/visualization/main_window.h",
-        "src/visualization/viewer_widget.h",
-        "src/visualization/viewer_widget_impl.h",
-        "src/visualization/visualization.h",
-        "src/visualization/draw_util.h", 
+        "src/viewer_widget.h",
+        "src/viewer_widget.cpp",
+        "src/main_window.cpp",
+        "include/visualization/client_data_accumulator.h",
+        "include/visualization/client_data_accumulator_impl.h",
+        "include/visualization/navigator.h",
+        "include/visualization/navigator_impl.h",
+        "include/visualization/visualization.h",
+        "include/visualization/drawer_impl.h",
+        "include/visualization/draw_util.h", 
+        "include/visualization/viewer.h",
+        "include/visualization/viewer_adapter.h",
     ]
 
     Depends { name: "cpp" }
     cpp.cppFlags: "-std=c++0x"
     cpp.includePaths: [
-        "src",
         "include",
-        "../common/include",
-        "../arithmetic/include",
-        "../geom-primitives/include",
+        "../core/common/include",
+        "../core/arithmetic/include",
+        "../core/primitives/include",
+        "../logger/include",
     ]
     cpp.precompiledHeader: "src/stdafx.h"
 
     Depends { name: "Qt"; submodules: ["core", "gui", "opengl"] }        
 
-    Depends { name: "geom-primitives" }
+    Depends { name: "primitives" }
+    Depends { name: "logger"     }
 }
 

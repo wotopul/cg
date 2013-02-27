@@ -1,12 +1,13 @@
+#pragma once
+
 #include "visualization/viewer.h"
 
 namespace visualization
 {
-    template<class ArithmeticTraits>
-    struct viewer_adapter : viewer_type<ArithmeticTraits>
+    template<typename Scalar>
+    struct viewer_adapter : viewer_type<Scalar>
     {
-        typedef viewer_type<ArithmeticTraits>   base_t;
-        typedef typename base_t::point_t        point_t;
+        typedef geom::structures::point_type<Scalar> point_t;
 
         virtual void print(std::ostream &) const {};
 

@@ -1,18 +1,20 @@
 #pragma once
 
-#include <QtOpenGL>
-
-#include "visualization/viewer.h"
+#include "viewer.h"
+#include "client_data_accumulator.h"
 
 namespace visualization
 {
 
-template<class ArithmeticTraits>
-struct drawer_impl : drawer_type<ArithmeticTraits>
+template<typename Scalar>
+struct drawer_impl : drawer_type<Scalar>
 {
-    typedef drawer_type<ArithmeticTraits>   base_t; 
+    typedef drawer_type<Scalar>   base_t; 
     typedef typename base_t::segment_type   segment_t;
     typedef typename base_t::point_type     point_t;
+
+    typedef client_data_accumulator_t::point_buffer_t    point_buffer_t;
+    typedef client_data_accumulator_t::segment_buffer_t  segment_buffer_t;
 
     virtual void set_color(QColor const & c)                                    override;
 
@@ -20,44 +22,28 @@ struct drawer_impl : drawer_type<ArithmeticTraits>
     virtual void draw_line(point_t const &, point_t const &,    float width)    override;
     virtual void draw_point(point_t const & pt,                 float radius)   override;
 
-    drawer_impl()
-        : current_color_ (Qt::black)
+    drawer_impl
+            ( QPointF const & viewport_lb
+            , std::vector<point_buffer_t>     & point_buffers
+            , std::vector<segment_buffer_t>   & segment_buffers
+            )
+        : current_color_(Qt::black)
+        , lb_(viewport_lb)
+        , point_buffers(point_buffers)
+        , segment_buffers(segment_buffers)
     {}
 
-    void clear();
-
-    struct point_buffer_t
-    {
-        std::vector<GLfloat>    points;
-        QColor                  color;
-        float radius;
-    };
-
-    struct segment_buffer_t
-    {
-        std::vector<GLfloat>    segments;
-        QColor                  color;
-        float width;
-    };
-
-    std::vector<point_buffer_t>     point_buffers;
-    std::vector<segment_buffer_t>   segment_buffers;
-
 private:
-    QColor current_color_;
+    QColor  current_color_;
+    QPointF lb_;
+    std::vector<point_buffer_t>     & point_buffers;
+    std::vector<segment_buffer_t>   & segment_buffers;
 };
 
 }
 
 namespace visualization
 {
-
-template<class Traits>
-void drawer_impl<Traits>::clear()
-{
-    point_buffers.clear();
-    segment_buffers.clear();
-}
 
 template<class Traits>
 void drawer_impl<Traits>::set_color(QColor const & c)
@@ -78,10 +64,10 @@ void drawer_impl<Traits>::draw_line(point_t const & a, point_t const & b, float 
     
     std::vector<GLfloat> & buffer = segment_buffers.back().segments;
     
-    buffer.push_back(Traits::to_float(a.x));
-    buffer.push_back(Traits::to_float(a.y));
-    buffer.push_back(Traits::to_float(b.x));
-    buffer.push_back(Traits::to_float(b.y));
+    buffer.push_back(a.x.to_double() - lb_.x());
+    buffer.push_back(a.y.to_double() - lb_.y());
+    buffer.push_back(b.x.to_double() - lb_.x());
+    buffer.push_back(b.y.to_double() - lb_.y());
 }
 
 template<class Traits>
@@ -102,8 +88,8 @@ void drawer_impl<Traits>::draw_point(point_t const & pt, float radius)
     }
     
     std::vector<GLfloat> & buffer = point_buffers.back().points;
-    buffer.push_back(Traits::to_float(pt.x));
-    buffer.push_back(Traits::to_float(pt.y));
+    buffer.push_back(pt.x.to_double() - lb_.x());
+    buffer.push_back(pt.y.to_double() - lb_.y());
 }
 
 }

@@ -21,22 +21,35 @@ namespace visualization
         virtual ~drawer_type() {};
     };
 
-    template<class ArithmeticTraits>
-    struct viewer_type
+    struct key_event_handler
     {
-        typedef drawer_type<ArithmeticTraits>                   drawer_t;
-        typedef geom::structures::point_type<ArithmeticTraits>  point_t;
+        virtual bool on_key(int key) = 0; 
+    };
 
-        virtual void draw   (drawer_t &  )              const   = 0;
-        virtual void print  (std::ostream & )           const   = 0;
+    template<class Point>
+    struct mouse_event_handler
+    {
+        virtual bool on_double_click(Point const & pos) = 0;
+        virtual bool on_move        (Point const & pos) = 0;
+        virtual bool on_press       (Point const & pos) = 0;
+        virtual bool on_release     (Point const & pos) = 0;
+    };
 
-        virtual void set_window(QWidget *)                      = 0;
+    struct printable
+    {
+        virtual void print(std::ostream &) const = 0;
+    };
 
-        virtual bool on_key         (int key)                   = 0; 
-        virtual bool on_double_click(point_t const & pos)       = 0;
-        virtual bool on_move        (point_t const & pos)       = 0;
-        virtual bool on_press       (point_t const & pos)       = 0;
-        virtual bool on_release     (point_t const & pos)       = 0;
+    template<typename Scalar>
+    struct viewer_type 
+        : key_event_handler
+        , mouse_event_handler<geom::structures::point_type<Scalar>>
+        , printable
+    {
+        typedef drawer_type<Scalar> drawer_t;
+
+        virtual void draw   (drawer_t &  ) const    = 0;
+        virtual void set_window(QWidget *)          = 0;
 
         virtual ~viewer_type() {};
     };
@@ -45,3 +58,4 @@ namespace visualization
     void run_viewer(viewer_type<ArithmeticTraits> * viewer, const char * title);
 
 } // namespace visualization
+
