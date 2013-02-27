@@ -25,13 +25,11 @@ StaticLibrary {
         "../core/common/include",
         "../core/arithmetic/include",
         "../core/primitives/include",
-        "../logger/include",
     ]
     cpp.precompiledHeader: "src/stdafx.h"
 
     Depends { name: "Qt"; submodules: ["core", "gui", "opengl"] }        
 
     Depends { name: "primitives" }
-    Depends { name: "logger"     }
 }
 

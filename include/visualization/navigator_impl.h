@@ -1,13 +1,9 @@
 #pragma once
 
 #include <io/point.h>
-#include <io/vector.h>
 #include <io/rectangle.h>
 
 #include <common/make.h>
-
-#include <logger/trace.h>
-#include <logger/stopwatch.h>
 
 namespace visualization
 {
@@ -26,8 +22,6 @@ namespace visualization
 
         world_point_t screen_to_world(screen_point_t const & screen_pos) const
         {
-            SET_STOPWATCH("screen_to_world(%1%, %2%)", screen_pos.x(), screen_pos.y())
-
             const double zoom = (viewport_.x.sup - viewport_.x.inf).to_double() / screen_size_.width();
             vector_t screen_translation(Scalar(screen_pos.x()), Scalar(screen_size_.height() - screen_pos.y())); 
             auto res = static_cast<world_point_t>
@@ -73,10 +67,6 @@ namespace visualization
 
         virtual bool zoom(float delta) override
         {
-            SET_STOPWATCH("zoom(%1%)", delta)
-
-            TRACE(viewport_);
-
             try 
             {
                 viewport_ = rectangle_t
@@ -89,22 +79,16 @@ namespace visualization
                 return false;
             }
 
-            TRACE(viewport_);
-
             return true;
         }
 
         virtual void set_current_pos(screen_point_t const & screen_pos) override
         {
-            SET_STOPWATCH("set_current_pos")
             current_pos_ = screen_to_world(screen_pos);
-            TRACE(current_pos_);
         }
 
         virtual void set_screen_size(QSize const & screen_size) override
         {
-            SET_STOPWATCH("set_screen_size")
-
             for (;;)
             {
                 auto size = world_viewport_size();
@@ -128,20 +112,12 @@ namespace visualization
 
             screen_size_ = screen_size;
             current_pos_  = viewport_.corner(0, 0);
-
-            TRACE(viewport_);
-            TRACE(screen_size_.width());
-            TRACE(screen_size_.height());
         }
 
         virtual void translate(screen_translation_t const & tr) override
         {
-            SET_STOPWATCH("translate(%1%, %2%)", tr.x(), tr.y());
-
             const double zoom = (viewport_.x.sup - viewport_.x.inf).to_double() / screen_size_.width();
             auto world_translation = zoom * vector_t(Scalar(-tr.x()), Scalar(tr.y()));
-            TRACE(zoom);
-            TRACE(world_translation);
 
             try
             {
