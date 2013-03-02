@@ -5,6 +5,7 @@
 
 namespace visualization
 {
+    using geom::structures::dpoint;
 
 template<typename Scalar>
 struct drawer_impl : drawer_type<Scalar>
@@ -23,7 +24,7 @@ struct drawer_impl : drawer_type<Scalar>
     virtual void draw_point(point_t const & pt,                 float radius)   override;
 
     drawer_impl
-            ( QPointF const & viewport_lb
+            ( dpoint const & viewport_lb
             , std::vector<point_buffer_t>     & point_buffers
             , std::vector<segment_buffer_t>   & segment_buffers
             )
@@ -34,8 +35,8 @@ struct drawer_impl : drawer_type<Scalar>
     {}
 
 private:
-    QColor  current_color_;
-    QPointF lb_;
+    QColor current_color_;
+    dpoint lb_;
     std::vector<point_buffer_t>     & point_buffers;
     std::vector<segment_buffer_t>   & segment_buffers;
 };
@@ -63,11 +64,14 @@ void drawer_impl<Traits>::draw_line(point_t const & a, point_t const & b, float 
     }
     
     std::vector<GLfloat> & buffer = segment_buffers.back().segments;
+
+    auto da = static_cast<dpoint>(a) - lb_;
+    auto db = static_cast<dpoint>(b) - lb_;
     
-    buffer.push_back(a.x.to_double() - lb_.x());
-    buffer.push_back(a.y.to_double() - lb_.y());
-    buffer.push_back(b.x.to_double() - lb_.x());
-    buffer.push_back(b.y.to_double() - lb_.y());
+    buffer.push_back(da.x);
+    buffer.push_back(da.y);
+    buffer.push_back(db.x);
+    buffer.push_back(db.y);
 }
 
 template<class Traits>
@@ -88,8 +92,9 @@ void drawer_impl<Traits>::draw_point(point_t const & pt, float radius)
     }
     
     std::vector<GLfloat> & buffer = point_buffers.back().points;
-    buffer.push_back(pt.x.to_double() - lb_.x());
-    buffer.push_back(pt.y.to_double() - lb_.y());
+    auto dpt = static_cast<dpoint>(pt) - lb_;
+    buffer.push_back(dpt.x);
+    buffer.push_back(dpt.y);
 }
 
 }

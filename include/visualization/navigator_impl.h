@@ -7,27 +7,29 @@
 
 namespace visualization
 {
+    using geom::structures::dvec;
+
     template<class Scalar>
     struct navigator_impl : navigator_t
     {
         navigator_impl()
-            : viewport_
-                ( range_t(Scalar(0), Scalar(1))
-                , range_t(Scalar(0), Scalar(1))
-                )
-            , screen_size_(1, 1)
-        {}
+            : screen_size_(1, 1)
+        {
+            typedef typename Scalar::value_type sv_t;
+
+            for (size_t axis = 0; axis != 2; ++axis)
+            {
+                viewport_[axis] = range_t(Scalar(sv_t(0)), Scalar(sv_t(1)));
+            }
+        }
 
         typedef geom::structures::point_type<Scalar>    world_point_t;
 
         world_point_t screen_to_world(screen_point_t const & screen_pos) const
         {
-            const double zoom = (viewport_.x.sup - viewport_.x.inf).to_double() / screen_size_.width();
-            vector_t screen_translation(Scalar(screen_pos.x()), Scalar(screen_size_.height() - screen_pos.y())); 
-            auto res = static_cast<world_point_t>
-                            ( viewport_.corner(0, 0) 
-                            + zoom * screen_translation
-                            );
+            const double zoom = static_cast<double>(viewport_.x.sup - viewport_.x.inf) / screen_size_.width();
+            dvec screen_translation(screen_pos.x(), screen_size_.height() - screen_pos.y()); 
+            world_point_t res(static_cast<dpoint>(viewport_.corner(0, 0)) + zoom * screen_translation);
 
             for (size_t axis = 0; axis <= 1; ++axis)
             {
@@ -38,20 +40,17 @@ namespace visualization
             return res;
         }
 
-        virtual QPointF viewport_lb()   const override
+        virtual dpoint viewport_lb() const override
         {
-            return QPointF(
-                viewport_.x.inf.to_double(),
-                viewport_.y.inf.to_double()
-            );
+            return static_cast<dpoint>(viewport_.corner(0, 0));
         }
 
         virtual QSizeF  viewport_size() const override
         {
             auto size = world_viewport_size();
             return QSizeF(
-                size.x.to_double(),
-                size.y.to_double()
+                static_cast<double>(size.x),
+                static_cast<double>(size.y)
             );
         }
 
@@ -67,12 +66,18 @@ namespace visualization
 
         virtual bool zoom(float delta) override
         {
+            dpoint p = static_cast<dpoint>(current_pos_);
             try 
             {
-                viewport_ = rectangle_t
-                    ( static_cast<world_point_t>(current_pos_ + delta * (static_cast<vector_t>(viewport_.corner(0, 0) - current_pos_)))
-                    , static_cast<world_point_t>(current_pos_ + delta * (static_cast<vector_t>(viewport_.corner(1, 1) - current_pos_)))
-                    );
+                world_point_t corner[2];
+                for (size_t i = 0; i != 2; ++i)
+                {
+                    corner[i] = static_cast<world_point_t>
+                        ( p 
+                        + delta * (static_cast<dvec>(viewport_.corner(i, i) - current_pos_))
+                        );
+                }
+                viewport_ = rectangle_t(corner[0], corner[1]);
             } 
             catch (arithmetic::overflow_error const &)
             {
@@ -91,16 +96,16 @@ namespace visualization
         {
             for (;;)
             {
-                auto size = world_viewport_size();
+                auto size = static_cast<dvec>(world_viewport_size());
                 try
                 {
                     viewport_.x.sup = static_cast<Scalar>
                         ( viewport_.x.inf 
-                        + Scalar::from_double(size.x.to_double() * screen_size.width() / screen_size_.width())
+                        + static_cast<Scalar>(size.x * screen_size.width() / screen_size_.width())
                         );
                     viewport_.y.sup = static_cast<Scalar>
                         ( viewport_.y.inf
-                        + Scalar::from_double(size.y.to_double() * screen_size.height() / screen_size_.height())
+                        + static_cast<Scalar>(size.y * screen_size.height() / screen_size_.height())
                         );
                     break;
                 }
@@ -116,8 +121,11 @@ namespace visualization
 
         virtual void translate(screen_translation_t const & tr) override
         {
-            const double zoom = (viewport_.x.sup - viewport_.x.inf).to_double() / screen_size_.width();
-            auto world_translation = zoom * vector_t(Scalar(-tr.x()), Scalar(tr.y()));
+            const double zoom = 
+                static_cast<double>(viewport_.x.sup - viewport_.x.inf) / screen_size_.width();
+
+            auto world_translation = 
+                static_cast<vector_t>(zoom * geom::structures::dvec(-tr.x(), tr.y()));
 
             try
             {

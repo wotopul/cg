@@ -2,13 +2,15 @@
 
 namespace visualization
 {
+    using geom::structures::dpoint;
+
     struct navigator_t
     {
         typedef QPoint screen_point_t;
         typedef QPoint screen_translation_t;
 
-        virtual QPointF viewport_lb()   const = 0;
-        virtual QSizeF  viewport_size() const = 0;
+        virtual dpoint viewport_lb()   const = 0;
+        virtual QSizeF viewport_size() const = 0;
 
         virtual void set_current_pos(screen_point_t const & ) = 0;
         virtual void translate(screen_translation_t const & ) = 0;
