@@ -25,6 +25,7 @@ StaticLibrary {
         "../core/common/include",
         "../core/arithmetic/include",
         "../core/primitives/include",
+        "../logger/include",
     ]
     cpp.precompiledHeader: "src/stdafx.h"
 

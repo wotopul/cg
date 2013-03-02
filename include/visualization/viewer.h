@@ -1,22 +1,27 @@
 #pragma once
 
-#include "geom/primitives/point.h"
-#include "geom/primitives/segment.h"
+#include <geom/primitives/point.h>
+#include <geom/primitives/segment.h>
+#include <geom/primitives/line.h>
 
 class QColor;
 
 namespace visualization 
 {
-    template<class ArithmeticTraits>
+    template<typename Scalar>
     struct drawer_type
     {
-        typedef geom::structures::point_type<ArithmeticTraits>      point_type;
-        typedef geom::structures::segment_type<ArithmeticTraits>    segment_type;
+        typedef geom::structures::point_type<Scalar>   point_t;
+        typedef geom::structures::segment_type<Scalar> segment_t;
+        typedef 
+            typename geom::structures::line_intersection_type<Scalar>::result_type
+            line_intersection_t;
 
-        virtual void set_color  (QColor const &)                                           = 0;
-        virtual void draw_line  (segment_type const &,                   float width  = 1) = 0;
-        virtual void draw_line  (point_type const &, point_type const &, float width  = 1) = 0;
-        virtual void draw_point (point_type const &,                     float radius = 1) = 0;
+        virtual void set_color  (QColor const &)                                     = 0;
+        virtual void draw_line  (segment_t const &,                float width  = 1) = 0;
+        virtual void draw_line  (point_t const &, point_t const &, float width  = 1) = 0;
+        virtual void draw_point (point_t const &,                  float radius = 1) = 0;
+        virtual void draw_point (line_intersection_t const &,      float radius = 1) = 0;
 
         virtual ~drawer_type() {};
     };
