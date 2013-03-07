@@ -23,13 +23,9 @@ namespace visualization
         {
             point_buffers.clear();
             segment_buffers.clear();
+            strings.clear();
 
-            drawer_impl<Scalar> drawer
-                ( navigator_->viewport() 
-                , point_buffers
-                , segment_buffers
-                );
-
+            drawer_impl<Scalar> drawer(navigator_->viewport(), this); 
             viewer_->draw(drawer);
         }
 

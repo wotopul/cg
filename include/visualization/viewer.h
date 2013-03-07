@@ -8,6 +8,8 @@ class QColor;
 
 namespace visualization 
 {
+    using geom::structures::dpoint;
+
     template<typename Scalar>
     struct drawer_type
     {
@@ -24,6 +26,7 @@ namespace visualization
         virtual void draw_point (line_intersection_t const &,      float radius = 1) = 0;
 
         virtual void draw_vertical_line(double x) = 0;
+        virtual void print(dpoint const & pos, std::string const & text) = 0;
 
         virtual ~drawer_type() {};
     };

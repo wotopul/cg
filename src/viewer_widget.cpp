@@ -40,6 +40,7 @@ void viewer_widget_t::initializeGL()
     assert(doubleBuffer());
     setAutoBufferSwap(true);
     qglClearColor(Qt::black);
+    glEnable(GL_POINT_SMOOTH);
 }
 
 void viewer_widget_t::resizeGL(int screen_w, int screen_h)
@@ -94,6 +95,11 @@ void viewer_widget_t::paintGL()
         
         glDisableClientState(GL_VERTEX_ARRAY);
     }
+
+    qglColor(Qt::white);
+
+    for (auto str : client_data_accumulator_->strings)
+        renderText(str.pos.x, str.pos.y, 0, str.text.c_str());
 }
 
 void viewer_widget_t::wheelEvent(QWheelEvent * e)
