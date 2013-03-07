@@ -5,6 +5,8 @@
 #include "visualization/client_data_accumulator.h"
 #include "visualization/navigator.h"
 
+#include <io/rectangle.h>
+
 namespace visualization 
 {
 
@@ -51,11 +53,11 @@ void viewer_widget_t::set_gl_transform(int screen_w, int screen_h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    QSizeF viewport_size = navigator_->viewport_size();
+    drect viewport = navigator_->viewport();
 
     glOrtho(
-        0, viewport_size.width(),
-        0, viewport_size.height(),
+        0, geom::structures::size(viewport.x),
+        0, geom::structures::size(viewport.y),
         -1.0, 1.0
         );
 
@@ -168,7 +170,8 @@ void viewer_widget_t::update_text_field(bool update_user_text)
     text_field_->insertPlainText("Viewport: ");
 
     text_field_->setTextColor(Qt::black); 
-    text_field_->insertPlainText(QString::fromStdString(navigator_->viewport()));
+    auto viewport_str = boost::lexical_cast<std::string>(navigator_->viewport()); 
+    text_field_->insertPlainText(QString::fromStdString(viewport_str));
     text_field_->insertPlainText(", ");
 
     text_field_->setTextColor(Qt::blue);

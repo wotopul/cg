@@ -2,7 +2,7 @@
 
 #include <QGLWidget>
 
-struct QTextEdit;
+class QTextEdit;
 
 #include "visualization/viewer.h"
 

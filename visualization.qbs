@@ -2,6 +2,7 @@ import qbs.base 1.0
 
 StaticLibrary {
     name: "visualization"
+
     files: [ 
         "src/stdafx.h",
         "src/viewer_widget.h",
@@ -19,6 +20,7 @@ StaticLibrary {
     ]
 
     Depends { name: "cpp" }
+
     cpp.cppFlags: "-std=c++0x"
     cpp.includePaths: [
         "include",
@@ -27,7 +29,8 @@ StaticLibrary {
         "../core/primitives/include",
         "../logger/include",
     ]
-    cpp.precompiledHeader: "src/stdafx.h"
+
+    //cpp.precompiledHeader: "src/stdafx.h"
 
     Depends { name: "Qt"; submodules: ["core", "gui", "opengl"] }        
 

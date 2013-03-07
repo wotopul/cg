@@ -3,11 +3,10 @@
 #include "viewer.h"
 #include "client_data_accumulator.h"
 
-#include <logger/debug_stream.h>
-
 namespace visualization
 {
     using geom::structures::dpoint;
+    using geom::structures::drect;
 
 template<typename Scalar>
 struct drawer_impl : drawer_type<Scalar>
@@ -27,23 +26,26 @@ struct drawer_impl : drawer_type<Scalar>
     virtual void draw_point(point_t const & pt,                 float radius)   override;
     virtual void draw_point(line_isect_t const &,               float radius)   override;
 
+    virtual void draw_vertical_line(double x) override;
+
     drawer_impl
-            ( dpoint const & viewport_lb
+            ( drect const & viewport
             , std::vector<point_buffer_t>     & point_buffers
             , std::vector<segment_buffer_t>   & segment_buffers
             )
         : current_color_(Qt::black)
-        , lb_(viewport_lb)
+        , viewport_(viewport)
         , point_buffers(point_buffers)
         , segment_buffers(segment_buffers)
     {}
 
 private:
     void draw_point(dpoint const & pt, float radius);
+    void draw_line(dpoint const & a, dpoint const & b, float width);
 
 private:
     QColor current_color_;
-    dpoint lb_;
+    drect viewport_;
     std::vector<point_buffer_t>     & point_buffers;
     std::vector<segment_buffer_t>   & segment_buffers;
 };
@@ -62,6 +64,24 @@ void drawer_impl<Traits>::set_color(QColor const & c)
 template<class Traits>
 void drawer_impl<Traits>::draw_line(point_t const & a, point_t const & b, float width)
 {
+    draw_line(static_cast<dpoint>(a), static_cast<dpoint>(b), width); 
+}
+
+template<class Traits>
+void drawer_impl<Traits>::draw_line(segment_t const & seg, float width)
+{
+    draw_line(seg[0], seg[1], width);
+}
+
+template<typename Scalar>
+void drawer_impl<Scalar>::draw_vertical_line(double x)
+{
+    draw_line(dpoint(x, viewport_.y.inf), dpoint(x, viewport_.y.sup), 1.f);
+}
+
+template<typename Scalar>
+void drawer_impl<Scalar>::draw_line(dpoint const & a, dpoint const & b, float width)
+{
     if (segment_buffers.empty() || (segment_buffers.back().width != width) ||
         (segment_buffers.back().color != current_color_))
     {
@@ -72,19 +92,14 @@ void drawer_impl<Traits>::draw_line(point_t const & a, point_t const & b, float 
     
     std::vector<GLfloat> & buffer = segment_buffers.back().segments;
 
-    auto da = static_cast<dpoint>(a) - lb_;
-    auto db = static_cast<dpoint>(b) - lb_;
+    dpoint lb = viewport_.corner(0, 0);
+    auto da = a - lb;
+    auto db = b - lb;
     
     buffer.push_back(da.x);
     buffer.push_back(da.y);
     buffer.push_back(db.x);
     buffer.push_back(db.y);
-}
-
-template<class Traits>
-void drawer_impl<Traits>::draw_line(segment_t const & seg, float width)
-{
-    draw_line(seg[0], seg[1], width);
 }
 
 template<typename Scalar>
@@ -115,9 +130,9 @@ void drawer_impl<Scalar>::draw_point(dpoint const & pt, float radius)
     }
     
     std::vector<GLfloat> & buffer = point_buffers.back().points;
-    auto dpt = pt - lb_;
-    buffer.push_back(dpt.x);
-    buffer.push_back(dpt.y);
+
+    buffer.push_back(pt.x - viewport_.x.inf);
+    buffer.push_back(pt.y - viewport_.y.inf);
 }
 
 }

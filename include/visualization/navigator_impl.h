@@ -1,7 +1,6 @@
 #pragma once
 
 #include <io/point.h>
-#include <io/rectangle.h>
 
 #include <common/make.h>
 
@@ -40,28 +39,14 @@ namespace visualization
             return res;
         }
 
-        virtual dpoint viewport_lb() const override
+        virtual drect viewport() const override
         {
-            return static_cast<dpoint>(viewport_.corner(0, 0));
-        }
-
-        virtual QSizeF  viewport_size() const override
-        {
-            auto size = world_viewport_size();
-            return QSizeF(
-                static_cast<double>(size.x),
-                static_cast<double>(size.y)
-            );
+            return static_cast<drect>(viewport_);
         }
 
         virtual std::string current_pos() const override
         {
             return boost::lexical_cast<std::string>(current_pos_);
-        }
-
-        virtual std::string viewport() const override
-        {
-            return boost::lexical_cast<std::string>(viewport_);
         }
 
         virtual bool zoom(float delta) override

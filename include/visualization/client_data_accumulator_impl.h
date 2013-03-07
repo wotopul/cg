@@ -25,7 +25,7 @@ namespace visualization
             segment_buffers.clear();
 
             drawer_impl<Scalar> drawer
-                ( navigator_->viewport_lb() 
+                ( navigator_->viewport() 
                 , point_buffers
                 , segment_buffers
                 );

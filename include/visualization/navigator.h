@@ -1,16 +1,17 @@
 #pragma once
 
+#include <geom/primitives/rectangle.h>
+
 namespace visualization
 {
-    using geom::structures::dpoint;
+    using geom::structures::drect;
 
     struct navigator_t
     {
         typedef QPoint screen_point_t;
         typedef QPoint screen_translation_t;
 
-        virtual dpoint viewport_lb()   const = 0;
-        virtual QSizeF viewport_size() const = 0;
+        virtual drect viewport() const = 0;
 
         virtual void set_current_pos(screen_point_t const & ) = 0;
         virtual void translate(screen_translation_t const & ) = 0;
@@ -19,7 +20,6 @@ namespace visualization
         virtual void set_screen_size(QSize const &)         = 0;
 
         virtual std::string current_pos()   const = 0;
-        virtual std::string viewport()      const = 0;
     };
 }
 

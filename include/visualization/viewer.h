@@ -23,6 +23,8 @@ namespace visualization
         virtual void draw_point (point_t const &,                  float radius = 1) = 0;
         virtual void draw_point (line_intersection_t const &,      float radius = 1) = 0;
 
+        virtual void draw_vertical_line(double x) = 0;
+
         virtual ~drawer_type() {};
     };
 
