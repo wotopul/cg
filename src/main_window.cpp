@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include <QWidget>
-#include <QVBoxLayout>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QVBoxLayout>
 
 #include "viewer_widget.h"
 #include "visualization/navigator.h"
