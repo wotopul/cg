@@ -13,10 +13,10 @@ namespace visualization
     template<typename Scalar>
     struct drawer_type
     {
-        typedef geom::structures::point_type<Scalar>   point_t;
-        typedef geom::structures::segment_type<Scalar> segment_t;
+        typedef geom::structures::point_type<Scalar>    point_t;
+        typedef geom::structures::segment_type<point_t> segment_t;
         typedef 
-            typename geom::structures::line_intersection_type<Scalar>::result_type
+            typename geom::structures::line_intersection_type<point_t>::result_type
             line_intersection_t;
 
         virtual void set_color  (QColor const &)                                     = 0;
