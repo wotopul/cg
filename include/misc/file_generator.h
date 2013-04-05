@@ -15,7 +15,7 @@ namespace util {
         using namespace boost::filesystem;
         path p(root);
         if (!is_directory(p)) {
-            throw std::invalid_argument("Given path " + p + " is not a directory");
+            throw std::invalid_argument("Given path " + p.string() + " is not a directory");
         }
 
         for (int i = 1; i <= count; ++i)
