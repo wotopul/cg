@@ -19,7 +19,6 @@ namespace cg
 
         class Printer
         {
-
             std::ostream& _stream;
 
         public:
