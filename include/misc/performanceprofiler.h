@@ -60,7 +60,7 @@ namespace util
                 {
                     auto sumStat = PerformanceProfiler::statistics[_name];
 
-                    _logStream << "Statistics for test: \""
+                    _logStream << "-------\nStatistics for test: \""
                                << _name
                                << "\".\nSingle execution time: "
                                << time.count()
@@ -86,6 +86,7 @@ namespace util
                                    << (it->second.second / it->second.first)
                                    << " seconds.\n";
                     }
+                    _logStream << "-------\n";
                 }
             }
 
