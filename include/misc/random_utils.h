@@ -3,66 +3,47 @@
 
 namespace util
 {
-    template<class Int>
-    class uniform_random_int
+
+    namespace detail
     {
-        std::random_device generator;
-        std::uniform_int_distribution<Int> d;
-    public:
-        uniform_random_int(Int min, Int max) : d(min, max)
-        {}
-
-        uniform_random_int() : uniform_random_int(std::numeric_limits<Int>::min(),
-                                    std::numeric_limits<Int>::max())
-        {}
-
-        Int operator() ()
+        template<class ValueType, class Distribution, class RandomDevice>
+        class random_generator
         {
-            return d(generator);
-        }
+            RandomDevice generator;
+            Distribution d;
+        public:
+            random_generator(ValueType min, ValueType max) : d(min, max)
+            {}
 
-        void reset(Int min, Int max)
-        {
-            d = std::uniform_int_distribution<Int>(min, max);
-        }
+            random_generator() : random_generator(std::numeric_limits<ValueType>::min(),
+                                                      std::numeric_limits<ValueType>::max())
+            {}
 
-        uniform_random_int& operator>> (Int& rhs)
-        {
-            rhs = (*this)();
-            return *this;
-        }
-    };
+            ValueType operator() ()
+            {
+                return d(generator);
+            }
 
-    template<class Real>
-    class uniform_random_real
-    {
-        std::random_device generator;
-        std::uniform_real_distribution<Real> d;
-    public:
-        uniform_random_real(Real min, Real max): d(min, max)
-        {}
+            void reset(ValueType min, ValueType max)
+            {
+                d = Distribution(min, max);
+            }
 
-        uniform_random_real(): d(std::numeric_limits<Real>::min(),
-                            std::numeric_limits<Real>::max())
-        {}
+            random_generator& operator>> (ValueType& rhs)
+            {
+                rhs = (*this)();
+                return *this;
+            }
+        };
+    }
 
-        void reset(Real min, Real max)
-        {
-            d = std::uniform_real_distribution<double>(min, max);
-        }
+    template<class Int, class RandomDevice = std::random_device>
+    using uniform_random_int = detail::random_generator<Int,
+          std::uniform_int_distribution<Int>, RandomDevice>;
 
-        double operator() ()
-        {
-            return d(generator);
-        }
-
-
-        uniform_random_real& operator>> (Real& rhs)
-        {
-            rhs = (*this)();
-            return *this;
-        }
-    };
+    template<class Real, class RandomDevice = std::random_device>
+    using uniform_random_real = detail::random_generator<Real,
+          std::uniform_real_distribution<Real>, RandomDevice>;
 
     inline std::string randomString(int length)
     {
