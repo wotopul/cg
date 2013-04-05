@@ -6,7 +6,7 @@
 
 std::vector<cg::point_2> uniform_points(size_t count)
 {
-    util::RandomReal<double> rand(-100., 100.);
+    util::uniform_random_real<double> rand(-100., 100.);
 
     std::vector<cg::point_2> res(count);
 

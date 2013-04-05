@@ -9,30 +9,30 @@ namespace util
 {
     namespace perftest
     {
-        class PerformanceProfiler
+        class performance_profiler
         {
         public:
-            PerformanceProfiler(std::string const& name, bool writeStats = true, std::ostream& logStream = std::cout)
+            performance_profiler(std::string const& name, bool writeStats = true, std::ostream& logStream = std::cout)
                 : _name(name),
                   _writeStats(writeStats),
                   _logStream(logStream),
                   _start(std::chrono::high_resolution_clock::now())
             {
-                PerformanceProfiler::history.push(name);
+                performance_profiler::history.push(name);
             }
 
-            ~PerformanceProfiler()
+            ~performance_profiler()
             {
                 using namespace std::chrono;
                 auto end = high_resolution_clock::now();
                 auto time = duration_cast<duration<double>>(end - _start);
 
-                PerformanceProfiler::history.pop();
-                auto statsIterator = PerformanceProfiler::statistics.find(_name);
+                performance_profiler::history.pop();
+                auto statsIterator = performance_profiler::statistics.find(_name);
 
-                if (statsIterator == PerformanceProfiler::statistics.end())
+                if (statsIterator == performance_profiler::statistics.end())
                 {
-                    PerformanceProfiler::statistics[_name] = {1, time.count()};
+                    performance_profiler::statistics[_name] = {1, time.count()};
                 }
                 else
                 {
@@ -40,14 +40,14 @@ namespace util
                     statsIterator->second.second += time.count();
                 }
 
-                if (!PerformanceProfiler::history.empty())
+                if (!performance_profiler::history.empty())
                 {
-                    auto parent = PerformanceProfiler::history.top();
-                    auto innerIterator = PerformanceProfiler::innerStatistics[parent].find(_name);
+                    auto parent = performance_profiler::history.top();
+                    auto innerIterator = performance_profiler::innerStatistics[parent].find(_name);
 
-                    if (innerIterator == PerformanceProfiler::innerStatistics[parent].end())
+                    if (innerIterator == performance_profiler::innerStatistics[parent].end())
                     {
-                        PerformanceProfiler::innerStatistics[parent].insert( {_name, {1, time.count()}});
+                        performance_profiler::innerStatistics[parent].insert( {_name, {1, time.count()}});
                     }
                     else
                     {
@@ -58,7 +58,7 @@ namespace util
 
                 if (_writeStats)
                 {
-                    auto sumStat = PerformanceProfiler::statistics[_name];
+                    auto sumStat = performance_profiler::statistics[_name];
 
                     _logStream << "-------\nStatistics for test: \""
                                << _name
@@ -73,8 +73,8 @@ namespace util
                                << " seconds.\n"
                                << "Inner tests:\n";
 
-                    for (auto it = PerformanceProfiler::innerStatistics[_name].begin();
-                            it != PerformanceProfiler::innerStatistics[_name].end(); ++it)
+                    for (auto it = performance_profiler::innerStatistics[_name].begin();
+                            it != performance_profiler::innerStatistics[_name].end(); ++it)
                     {
                         _logStream << " Name: \""
                                    << it->first
@@ -86,6 +86,7 @@ namespace util
                                    << (it->second.second / it->second.first)
                                    << " seconds.\n";
                     }
+
                     _logStream << "-------\n";
                 }
             }
@@ -101,8 +102,8 @@ namespace util
             static std::stack<std::string> history;
         };
 
-        std::unordered_map<std::string, std::pair<int, double>> PerformanceProfiler::statistics;
-        std::unordered_map<std::string, std::unordered_map<std::string, std::pair<int, double>>> PerformanceProfiler::innerStatistics;
-        std::stack<std::string> PerformanceProfiler::history;
+        std::unordered_map<std::string, std::pair<int, double>> performance_profiler::statistics;
+        std::unordered_map<std::string, std::unordered_map<std::string, std::pair<int, double>>> performance_profiler::innerStatistics;
+        std::stack<std::string> performance_profiler::history;
     }
 }

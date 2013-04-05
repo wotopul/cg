@@ -4,15 +4,15 @@
 namespace util
 {
     template<class Int>
-    class RandomInt
+    class uniform_random_int
     {
         std::random_device generator;
         std::uniform_int_distribution<Int> d;
     public:
-        RandomInt(Int min, Int max) : d(min, max)
+        uniform_random_int(Int min, Int max) : d(min, max)
         {}
 
-        RandomInt() : RandomInt(std::numeric_limits<Int>::min(),
+        uniform_random_int() : uniform_random_int(std::numeric_limits<Int>::min(),
                                     std::numeric_limits<Int>::max())
         {}
 
@@ -26,7 +26,7 @@ namespace util
             d = std::uniform_int_distribution<Int>(min, max);
         }
 
-        RandomInt& operator>> (Int& rhs)
+        uniform_random_int& operator>> (Int& rhs)
         {
             rhs = (*this)();
             return *this;
@@ -34,15 +34,15 @@ namespace util
     };
 
     template<class Real>
-    class RandomReal
+    class uniform_random_real
     {
         std::random_device generator;
         std::uniform_real_distribution<Real> d;
     public:
-        RandomReal(Real min, Real max): d(min, max)
+        uniform_random_real(Real min, Real max): d(min, max)
         {}
 
-        RandomReal(): d(std::numeric_limits<Real>::min(),
+        uniform_random_real(): d(std::numeric_limits<Real>::min(),
                             std::numeric_limits<Real>::max())
         {}
 
@@ -57,7 +57,7 @@ namespace util
         }
 
 
-        RandomReal& operator>> (Real& rhs)
+        uniform_random_real& operator>> (Real& rhs)
         {
             rhs = (*this)();
             return *this;
@@ -66,7 +66,7 @@ namespace util
 
     inline std::string randomString(int length)
     {
-        RandomInt<char> rand('a', 'z');
+        uniform_random_int<char> rand('a', 'z');
         std::string result;
         result.reserve(length);
 
