@@ -3,12 +3,13 @@
 #include <boost/filesystem.hpp>
 #include <string>
 #include <stdexcept>
+#include <fstream>
 
 namespace util {
 
     template<class T>
-    generate_files(std::string const& root,
-                   std::function<bool(std::ofstream&, int)> generator_function,
+    void generate_files(std::string const& root,
+                   T const& generator_function,
                    int count,
                    std::string const& prefix = "")
     {
@@ -21,7 +22,7 @@ namespace util {
         for (int i = 1; i <= count; ++i)
         {
             path file = p / (prefix + std::to_string(i));
-            std::ofstream ofs(p.string());
+            std::ofstream ofs(file.string());
             if (!generator_function(ofs, i)) {
                 std::cerr << "Error generating file " << file;
             }
