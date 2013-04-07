@@ -6,7 +6,9 @@
 #include "random_utils.h"
 
 using namespace util;
+using namespace cg;
 
+// -- START points orientation --
 TEST(orientation, uniform_line)
 {
    uniform_random_real<double, std::mt19937> distr(-(1LL << 53), (1LL << 53));
@@ -27,3 +29,30 @@ TEST(orientation, uniform_line)
       }
    }
 }
+// -- END points orientation --
+
+// -- START contour orientation --
+TEST(orientation_c, t1)
+{
+   contour_2 contour({{1, 1}, {2, 0}, {0, 1.1}});
+   EXPECT_EQ(orientation(contour), CG_CLOCKWISE);
+}
+
+TEST(orientation_c, t2)
+{
+   contour_2 contour({{1, 1}, {0, 1.1}, {2, 0}});
+   EXPECT_EQ(orientation(contour), CG_COUNTERCLOCKWISE);
+}
+
+TEST(orientation_c, t3)
+{
+   contour_2 contour({{0, 0}, {-1, 2}, {2, 3}, {3, 4}, {1, -1}});
+   EXPECT_EQ(orientation(contour), CG_CLOCKWISE);
+}
+
+TEST(orientation_c, t4)
+{
+   contour_2 contour({{1, -1}, {3, 4}, {2, 3}, {-1, 2}, {0, 0}});
+   EXPECT_EQ(orientation(contour), CG_COUNTERCLOCKWISE);
+}
+// -- END contour orientation

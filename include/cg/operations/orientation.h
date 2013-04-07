@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cg/primitives/point.h"
+#include <cg/primitives/contour.h>
 #include <boost/numeric/interval.hpp>
 #include <gmpxx.h>
 
@@ -13,6 +14,11 @@ namespace cg
       CG_RIGHT = -1,
       CG_COLLINEAR = 0,
       CG_LEFT = 1
+   };
+
+   enum contour_orientation_t
+   {
+      CG_CLOCKWISE, CG_COUNTERCLOCKWISE
    };
 
    struct orientation_d
@@ -86,4 +92,17 @@ namespace cg
 
       return *orientation_r()(a, b, c);
    }
+
+
+   inline contour_orientation_t orientation(contour_2 const& contour)
+   {
+      auto left = std::min_element(contour.begin(), contour.end());
+      auto circulator = contour.circulator(left);
+      auto const& point = *left;
+      auto const& prev = *(--circulator);
+      ++circulator;
+      auto const& next = *(++circulator);
+      return orientation(point, prev, next) == CG_LEFT ? CG_CLOCKWISE : CG_COUNTERCLOCKWISE;
+   }
+
 }

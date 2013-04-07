@@ -42,6 +42,11 @@ namespace cg
          return common::range_circulator<contour_2t<Scalar>>(*this);
       }
 
+      common::range_circulator<contour_2t<Scalar>> circulator(const_iterator itr) const
+      {
+         return common::range_circulator<contour_2t<Scalar>>(*this, itr);
+      }
+
       size_t vertices_num() const
       {
          return pts_.size();
