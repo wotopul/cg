@@ -9,6 +9,7 @@ namespace cg
 
    typedef rectangle_2t<float> rectangle_2f;
    typedef rectangle_2t<int>   rectangle_2i;
+   typedef rectangle_2t<double>   rectangle_2;
 
    template <class Scalar>
    struct rectangle_2t
