@@ -164,7 +164,7 @@ namespace cg
          return false;
       }
 
-      return point_in_triangle( {contour[0], *itr, *(itr - 1)}, point);
+      return orientation(*(itr - 1), *itr, point) != CG_LEFT;
    }
 
    inline bool point_in_contour(contour_2 const& contour, point_2 const& val)
