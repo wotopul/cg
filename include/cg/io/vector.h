@@ -6,7 +6,8 @@
 namespace cg
 {
    template <class Scalar>
-   std::istream & operator >> (std::istream & in, rectangle_2t<Scalar> & v)
+   std::istream & operator >> (std::istream & in, vector_2t<Scalar> & v)
+
    {
       using io::skip_char;
 
