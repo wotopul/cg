@@ -20,20 +20,37 @@ namespace cg
       contour_2t(std::vector<point_2t<Scalar> > && pts) : pts_(pts)
       {}
 
-      contour_2t(contour_2t const &)              = delete;
-      contour_2t& operator = (contour_2t const &) = delete;
+      contour_2t(contour_2t const&)              = delete;
+      contour_2t& operator = (contour_2t const&) = delete;
 
       contour_2t(contour_2t && cnt);
       contour_2t& operator = (contour_2t && cnt);
 
       typedef typename std::vector<point_2t<Scalar> >::const_iterator const_iterator;
 
-      const_iterator begin()    const { return pts_.begin(); }
-      const_iterator end()      const { return pts_.end();   }
+      const_iterator begin()    const
+      {
+         return pts_.begin();
+      }
+      const_iterator end()      const
+      {
+         return pts_.end();
+      }
 
-      size_t vertices_num() const { return pts_.size(); }
+      common::range_circulator<contour_2t<Scalar>> circulator() const
+      {
+         return common::range_circulator<contour_2t<Scalar>>(*this);
+      }
 
-      point_2t<Scalar> const & operator [] (size_t idx) const { return pts_[idx]; }
+      size_t vertices_num() const
+      {
+         return pts_.size();
+      }
+
+      point_2t<Scalar> const& operator [] (size_t idx) const
+      {
+         return pts_[idx];
+      }
 
    private:
       friend struct contour_builder_type;
