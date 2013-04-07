@@ -17,16 +17,11 @@ namespace cg
    template <class Scalar>
    struct contour_2t
    {
-      contour_2t(std::vector<point_2t<Scalar> > && pts) : pts_(pts)
+      contour_2t(std::vector<point_2t<Scalar> > const& pts) : pts_(pts)
       {}
 
-      contour_2t(contour_2t const&)              = delete;
-      contour_2t& operator = (contour_2t const&) = delete;
-
-      contour_2t(contour_2t && cnt);
-      contour_2t& operator = (contour_2t && cnt);
-
       typedef typename std::vector<point_2t<Scalar> >::const_iterator const_iterator;
+      typedef typename common::range_circulator<contour_2t<Scalar>> circulator_t;
 
       const_iterator begin()    const
       {
@@ -37,12 +32,12 @@ namespace cg
          return pts_.end();
       }
 
-      common::range_circulator<contour_2t<Scalar>> circulator() const
+      circulator_t circulator() const
       {
          return common::range_circulator<contour_2t<Scalar>>(*this);
       }
 
-      common::range_circulator<contour_2t<Scalar>> circulator(const_iterator itr) const
+      circulator_t circulator(const_iterator itr) const
       {
          return common::range_circulator<contour_2t<Scalar>>(*this, itr);
       }
@@ -50,6 +45,11 @@ namespace cg
       size_t vertices_num() const
       {
          return pts_.size();
+      }
+
+      size_t size() const
+      {
+         return vertices_num();
       }
 
       point_2t<Scalar> const& operator [] (size_t idx) const
