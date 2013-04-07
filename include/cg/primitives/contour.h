@@ -11,6 +11,7 @@ namespace cg
    struct contour_2t;
 
    typedef contour_2t<float> contour_2f;
+   typedef contour_2t<double> contour_2;
    typedef contour_2t<int>   contour_2i;
 
    template <class Scalar>
