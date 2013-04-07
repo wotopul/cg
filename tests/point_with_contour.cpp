@@ -48,6 +48,20 @@ TEST(convex_contour_point, t6)
    point_2 p {1, 4};
    EXPECT_EQ(point_in_convex_contour(contour, p), false);
 }
+
+TEST(convex_contour_point, t7)
+{
+   contour_2 contour( {{0, 0}, {0, 2}, {2, 0}});
+   point_2 p {1, 0};
+   EXPECT_EQ(point_in_convex_contour(contour, p), true);
+}
+
+TEST(convex_contour_point, t8)
+{
+   contour_2 contour( {{0, 0}, {0, 2}, {2, 0}});
+   point_2 p {0, 1};
+   EXPECT_EQ(point_in_convex_contour(contour, p), true);
+}
 // -- END point in convex contour --
 
 // -- START point in arbitrary contour --
