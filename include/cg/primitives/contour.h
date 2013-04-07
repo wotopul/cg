@@ -17,6 +17,9 @@ namespace cg
    template <class Scalar>
    struct contour_2t
    {
+      contour_2t(std::vector<point_2t<Scalar> > && pts) : pts_(pts)
+      {}
+
       contour_2t(contour_2t const &)              = delete;
       contour_2t& operator = (contour_2t const &) = delete;
 
@@ -34,8 +37,6 @@ namespace cg
 
    private:
       friend struct contour_builder_type;
-
-      contour_2t(std::vector<point_2t<Scalar> > && pts);
 
       std::vector<point_2t<Scalar> > pts_;
    };

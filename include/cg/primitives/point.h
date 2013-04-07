@@ -10,6 +10,7 @@ namespace cg
    typedef point_2t<float>    point_2f;
    typedef point_2t<int>      point_2i;
 
+
    template <class Scalar>
    struct point_2t
    {

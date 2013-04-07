@@ -15,6 +15,7 @@ link_directories(${Boost_LIBRARYDIR})
 set(SOURCES
    orientation.cpp
    segment_intersection.cpp
+   point_with_contour.cpp
 )
 
 add_executable(cg-test ${SOURCES})

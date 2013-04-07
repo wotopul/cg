@@ -110,6 +110,24 @@ TEST(triangle_test, t5)
     point_2 p(1, 1);
     EXPECT_EQ(point_in_triangle(tr, p), true);
 }
+
+TEST(triangle_test, t6)
+{
+    point_2 p1(0, 0), p2(2, 2), p3(2, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(1, 0.5);
+    EXPECT_EQ(point_in_triangle(tr, p), true);
+}
+
+TEST(triangle_test, t7)
+{
+    point_2 p1(0, 0), p2(0, 2), p3(2, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(1, 1);
+    EXPECT_EQ(point_in_triangle(tr, p), true);
+}
 // ---- END point in triangle --
 
 // ---- START segment in triangle --

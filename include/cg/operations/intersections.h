@@ -4,6 +4,7 @@
 #include <cg/primitives/segment.h>
 #include <cg/primitives/triangle.h>
 #include <cg/primitives/rectangle.h>
+#include <cg/primitives/contour.h>
 
 namespace cg
 {
@@ -93,4 +94,30 @@ namespace cg
       return have_intersection(tr1, segment) || have_intersection(tr2, segment);
    }
 
+   /**
+    * @brief Checks if the point is inside the convex contour oriented clockwise
+    * @param contour Convex clockwise oriented contour
+    * @param point Point that should be checked
+    * @return True if point is inside the contour, false otherwise
+    */
+   inline bool point_in_convex_contour(contour_2 const& contour, point_2 const& point)
+   {
+      auto first = contour[0];
+      if (orientation(first, contour[1], point) == CG_LEFT)
+      {
+         return false;
+      }
+      auto itr = std::lower_bound(contour.begin() + 2, contour.end(), point,
+                                  [&] (point_2 const& l, point_2 const& val)
+      {
+                 auto o = orientation(first, l, val);
+                 return o == CG_RIGHT;
+      });
+      if (itr == contour.end())
+      {
+         return false;
+      }
+
+      return point_in_triangle({contour[0], *itr, *(itr - 1)}, point);
+   }
 }
