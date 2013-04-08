@@ -14,7 +14,7 @@ link_directories(${Boost_LIBRARYDIR})
 
 set(SOURCES
    orientation.cpp
-   segment_intersection.cpp
+   intersection.cpp
    point_with_contour.cpp
 )
 

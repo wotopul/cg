@@ -5,6 +5,71 @@
 
 using namespace cg;
 
+// ---- START point in triangle --
+TEST(triangle_test, t1)
+{
+    point_2 p1(0, 0), p2(2, 2), p3(4, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(2, 1);
+    EXPECT_EQ(point_in_triangle(tr, p), true);
+}
+
+TEST(triangle_test, t2)
+{
+    point_2 p1(0, 0), p2(2, 2), p3(4, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(0, 0);
+    EXPECT_EQ(point_in_triangle(tr, p), true);
+}
+
+TEST(triangle_test, t3)
+{
+    point_2 p1(0, 0), p2(2, 2), p3(4, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(1, 0);
+    EXPECT_EQ(point_in_triangle(tr, p), true);
+}
+
+TEST(triangle_test, t4)
+{
+    point_2 p1(0, 0), p2(2, 2), p3(4, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(0, 1);
+    EXPECT_EQ(point_in_triangle(tr, p), false);
+}
+
+TEST(triangle_test, t5)
+{
+    point_2 p1(0, 0), p2(2, 2), p3(4, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(1, 1);
+    EXPECT_EQ(point_in_triangle(tr, p), true);
+}
+
+TEST(triangle_test, t6)
+{
+    point_2 p1(0, 0), p2(2, 2), p3(2, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(1, 0.5);
+    EXPECT_EQ(point_in_triangle(tr, p), true);
+}
+
+TEST(triangle_test, t7)
+{
+    point_2 p1(0, 0), p2(0, 2), p3(2, 0);
+
+    triangle_2 tr(p1, p2, p3);
+    point_2 p(1, 1);
+    EXPECT_EQ(point_in_triangle(tr, p), true);
+}
+// ---- END point in triangle --
+
 // -- START point in convex contour --
 TEST(convex_contour_point, t1)
 {
