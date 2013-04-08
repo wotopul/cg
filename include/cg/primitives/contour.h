@@ -23,11 +23,13 @@ namespace cg
       typedef typename std::vector<point_2t<Scalar> >::const_iterator const_iterator;
       typedef typename common::range_circulator<contour_2t<Scalar>> circulator_t;
 
-      const_iterator begin()    const
+
+      const_iterator begin() const
       {
          return pts_.begin();
       }
-      const_iterator end()      const
+
+      const_iterator end() const
       {
          return pts_.end();
       }
