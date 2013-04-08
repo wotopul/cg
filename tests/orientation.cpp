@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <cg/operations/orientation.h>
+
 #include <misc/performance_profiler.h>
 #include <misc/random_utils.h>
 #include "random_utils.h"
