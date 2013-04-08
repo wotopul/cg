@@ -34,8 +34,8 @@ namespace cg
 
       static range_t maximal()
       {
-         static const Scalar max_val = std::numeric_limits<Scalar>::max();
-         return range_t(-max_val, max_val);
+         return range_t(std::numeric_limits<Scalar>::lowest(),
+                        std::numeric_limits<Scalar>::max());
       }
    };
 
