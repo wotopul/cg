@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cg/primitives/point.h"
+#include "cg/primitives/contour.h"
+
 #include <boost/numeric/interval.hpp>
 #include <gmpxx.h>
 
@@ -94,4 +96,6 @@ namespace cg
 
       return *orientation_r()(a, b, c);
    }
+
+   inline bool counterclockwise(contour_2 const & c);
 }
