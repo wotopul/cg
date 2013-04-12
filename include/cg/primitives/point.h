@@ -21,6 +21,12 @@ namespace cg
          , y(y)
       {}
 
+      template <class UScalar>
+      point_2t(point_2t<UScalar> const & o)
+         : x(o.x)
+         , y(o.y)
+      {}
+
       point_2t()
          : x(0)
          , y(0)
@@ -54,6 +60,19 @@ namespace cg
    {
       return (a.x == b.x) && (a.y == b.y);
    }
+
+   template <class Scalar>
+   bool operator <= (point_2t<Scalar> const & a, point_2t<Scalar> const & b)
+   {
+      return !(a > b);
+   }
+
+   template <class Scalar>
+   bool operator >= (point_2t<Scalar> const & a, point_2t<Scalar> const & b)
+   {
+      return !(a < b);
+   }
+
 
    template <class Scalar>
    bool operator != (point_2t<Scalar> const & a, point_2t<Scalar> const & b)

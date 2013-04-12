@@ -36,24 +36,24 @@ TEST(orientation, uniform_line)
 TEST(orientation_c, t1)
 {
    contour_2 contour({{1, 1}, {2, 0}, {0, 1.1}});
-   EXPECT_EQ(orientation(contour), CG_CLOCKWISE);
+   EXPECT_EQ(counterclockwise(contour), false);
 }
 
 TEST(orientation_c, t2)
 {
    contour_2 contour({{1, 1}, {0, 1.1}, {2, 0}});
-   EXPECT_EQ(orientation(contour), CG_COUNTERCLOCKWISE);
+   EXPECT_EQ(counterclockwise(contour), true);
 }
 
 TEST(orientation_c, t3)
 {
    contour_2 contour({{0, 0}, {-1, 2}, {2, 3}, {3, 4}, {1, -1}});
-   EXPECT_EQ(orientation(contour), CG_CLOCKWISE);
+   EXPECT_EQ(counterclockwise(contour), false);
 }
 
 TEST(orientation_c, t4)
 {
    contour_2 contour({{1, -1}, {3, 4}, {2, 3}, {-1, 2}, {0, 0}});
-   EXPECT_EQ(orientation(contour), CG_COUNTERCLOCKWISE);
+   EXPECT_EQ(counterclockwise(contour), true);
 }
 // -- END contour orientation

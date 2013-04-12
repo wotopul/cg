@@ -1,5 +1,9 @@
 #include <gtest/gtest.h>
-#include <cg/operations/intersections.h>
+#include <cg/operations/has_intersection/segment_segment.h>
+#include <cg/operations/has_intersection/triangle_segment.h>
+#include <cg/operations/has_intersection/rectangle_segment.h>
+#include <cg/primitives/triangle.h>
+#include <cg/primitives/rectangle.h>
 #include <misc/random_utils.h>
 
 using namespace cg;
@@ -11,7 +15,7 @@ TEST(segment_intersection, t1) {
 
     segment_2 s1(a1, a2), s2(a3, a4);
 
-    EXPECT_EQ(have_intersection(s1, s2), true);
+    EXPECT_EQ(has_intersection(s1, s2), true);
 }
 
 
@@ -20,7 +24,7 @@ TEST(segment_intersection, touch) {
 
     segment_2 s1(a1, a2), s2(a3, a4);
 
-    EXPECT_EQ(have_intersection(s1, s2), true);
+    EXPECT_EQ(has_intersection(s1, s2), true);
 }
 
 TEST(segment_intersection, touch1) {
@@ -28,7 +32,7 @@ TEST(segment_intersection, touch1) {
 
     segment_2 s1(a1, a2), s2(a3, a4);
 
-    EXPECT_EQ(have_intersection(s1, s2), true);
+    EXPECT_EQ(has_intersection(s1, s2), true);
 }
 
 TEST(segment_intersection, touch2) {
@@ -36,7 +40,7 @@ TEST(segment_intersection, touch2) {
 
     segment_2 s1(a1, a2), s2(a3, a4);
 
-    EXPECT_EQ(have_intersection(s1, s2), true);
+    EXPECT_EQ(has_intersection(s1, s2), true);
 }
 
 
@@ -45,7 +49,7 @@ TEST(segment_intersection, line1) {
 
     segment_2 s1(a1, a2), s2(a3, a4);
 
-    EXPECT_EQ(have_intersection(s1, s2), true);
+    EXPECT_EQ(has_intersection(s1, s2), true);
 }
 
 TEST(segment_intersection, line2) {
@@ -53,7 +57,7 @@ TEST(segment_intersection, line2) {
 
     segment_2 s1(a1, a2), s2(a3, a4);
 
-    EXPECT_EQ(have_intersection(s1, s2), true);
+    EXPECT_EQ(has_intersection(s1, s2), true);
 }
 
 TEST(segment_intersection, line3) {
@@ -61,7 +65,7 @@ TEST(segment_intersection, line3) {
 
     segment_2 s1(a1, a2), s2(a3, a4);
 
-    EXPECT_EQ(have_intersection(s1, s2), false);
+    EXPECT_EQ(has_intersection(s1, s2), false);
 }
 // -- END segment_intersection --
 
@@ -73,7 +77,7 @@ TEST(triangle_test_s, t1)
     triangle_2 tr(p1, p2, p3);
     point_2 pt1(1, 1), pt2(2, 0);
     segment_2 s(pt1, pt2);
-    EXPECT_EQ(have_intersection(tr, s), true);
+    EXPECT_EQ(has_intersection(tr, s), true);
 }
 
 TEST(triangle_test_s, t2)
@@ -83,7 +87,7 @@ TEST(triangle_test_s, t2)
     triangle_2 tr(p1, p2, p3);
     point_2 pt1(0, 2), pt2(4, 2);
     segment_2 s(pt1, pt2);
-    EXPECT_EQ(have_intersection(tr, s), true);
+    EXPECT_EQ(has_intersection(tr, s), true);
 }
 
 
@@ -94,7 +98,7 @@ TEST(triangle_test_s, t3)
     triangle_2 tr(p1, p2, p3);
     point_2 pt1(0, 0), pt2(1, 1);
     segment_2 s(pt1, pt2);
-    EXPECT_EQ(have_intersection(tr, s), true);
+    EXPECT_EQ(has_intersection(tr, s), true);
 }
 
 TEST(triangle_test_s, t4)
@@ -104,7 +108,7 @@ TEST(triangle_test_s, t4)
     triangle_2 tr(p1, p2, p3);
     point_2 pt1(10, 0), pt2(10, 1);
     segment_2 s(pt1, pt2);
-    EXPECT_EQ(have_intersection(tr, s), false);
+    EXPECT_EQ(has_intersection(tr, s), false);
 }
 // -- END segment in triangle --
 
@@ -116,7 +120,7 @@ TEST(rect_test, t1)
     point_2 p1(-1, 0.5), p2(1, 0.5);
     segment_2 s(p1, p2);
 
-    EXPECT_EQ(have_intersection(rect, s), true);
+    EXPECT_EQ(has_intersection(rect, s), true);
 }
 
 TEST(rect_test, t2)
@@ -126,7 +130,7 @@ TEST(rect_test, t2)
     point_2 p1(-1, 0.5), p2(-2, 0.5);
     segment_2 s(p1, p2);
 
-    EXPECT_EQ(have_intersection(rect, s), false);
+    EXPECT_EQ(has_intersection(rect, s), false);
 }
 
 
@@ -137,7 +141,7 @@ TEST(rect_test, t3)
     point_2 p1(0, 0), p2(0, 1);
     segment_2 s(p1, p2);
 
-    EXPECT_EQ(have_intersection(rect, s), true);
+    EXPECT_EQ(has_intersection(rect, s), true);
 }
 
 TEST(rect_test, t4)
@@ -147,7 +151,7 @@ TEST(rect_test, t4)
     point_2 p1(-1, -1), p2(2, 2);
     segment_2 s(p1, p2);
 
-    EXPECT_EQ(have_intersection(rect, s), true);
+    EXPECT_EQ(has_intersection(rect, s), true);
 }
 
 TEST(rect_test, t5)
@@ -157,6 +161,6 @@ TEST(rect_test, t5)
     point_2 p1(0, 0), p2(3, 0);
     segment_2 s(p1, p2);
 
-    EXPECT_EQ(have_intersection(rect, s), true);
+    EXPECT_EQ(has_intersection(rect, s), true);
 }
 // -- END rectangle --

@@ -4,7 +4,7 @@
 #include <cg/primitives/point.h>
 #include <misc/random_utils.h>
 
-std::vector<cg::point_2> uniform_points(size_t count)
+inline std::vector<cg::point_2> uniform_points(size_t count)
 {
     util::uniform_random_real<double> rand(-10000., 10000.);
 
