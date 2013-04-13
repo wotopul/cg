@@ -86,37 +86,32 @@ void main_window_t::paintGL()
 {
    glClear(GL_COLOR_BUFFER_BIT);
 
-   for (drawer_impl::point_buffer_t const & buffer : drawer_.point_buffers)
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glEnableClientState(GL_COLOR_ARRAY);
+
+   for (std::pair<float, drawer_impl::point_buffer_t> const & buffer : drawer_.point_buffers)
    {
-      glPointSize(buffer.radius);
+      glPointSize(buffer.first);
 
-      glEnableClientState(GL_VERTEX_ARRAY);
-      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer (2, GL_FLOAT, 0, buffer.second.points.data());
+      glColorPointer  (3, GL_FLOAT, 0, buffer.second.colors.data());
 
-      glVertexPointer (2, GL_FLOAT, 0, &buffer.points[0]);
-      glColorPointer  (3, GL_FLOAT, 0, &buffer.colors[0]);
-
-      glDrawArrays(GL_POINTS, 0, buffer.points.size() / 2);
-
-      glDisableClientState(GL_VERTEX_ARRAY);
-      glDisableClientState(GL_COLOR_ARRAY);
+      glDrawArrays(GL_POINTS, 0, buffer.second.points.size() / 2);
    }
 
-   for (drawer_impl::segment_buffer_t const & buffer : drawer_.segment_buffers)
+   for (std::pair<float, drawer_impl::segment_buffer_t> const & buffer : drawer_.segment_buffers)
    {
-      glLineWidth(buffer.width);
+      glLineWidth(buffer.first);
 
-      glEnableClientState(GL_VERTEX_ARRAY);
-      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer (2, GL_FLOAT, 0, buffer.second.segments.data());
+      glColorPointer  (3, GL_FLOAT, 0, buffer.second.colors.data());
 
-      glVertexPointer (2, GL_FLOAT, 0, &buffer.segments[0]);
-      glColorPointer  (3, GL_FLOAT, 0, &buffer.colors[0]);
+      glDrawArrays(GL_LINES, 0, buffer.second.segments.size() / 2);
 
-      glDrawArrays(GL_LINES, 0, buffer.segments.size() / 2);
-
-      glDisableClientState(GL_VERTEX_ARRAY);
-      glDisableClientState(GL_COLOR_ARRAY);
    }
+
+   glDisableClientState(GL_VERTEX_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
 
    printer_impl printer(   boost::bind(&main_window_t::draw_string,        this, _1, _2),
                            boost::bind(&main_window_t::draw_string_global, this, _1, _2)   );
@@ -131,16 +126,7 @@ void main_window_t::wheelEvent(QWheelEvent * e)
    double old_zoom = zoom_;
 
    int delta = e->delta() / 8 / 15;
-   if (delta > 0)
-   {
-      for (int i = 0; i != delta; ++i)
-         zoom_ *= 1.1;
-   }
-   else if (delta < 0)
-   {
-      for (int i = 0; i != delta; --i)
-         zoom_ /= 1.1;
-   }
+   zoom_ *= pow(1.1, delta);
 
    point_2f pos(e->pos().x(), e->pos().y());
    point_2f sz(size().width() / 2, size().height() / 2);
