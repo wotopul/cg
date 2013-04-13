@@ -4,7 +4,7 @@ namespace cg {
 namespace visualization {
 
    interactive_viewer::interactive_viewer ( )
-      : choose_distance_(1000.0)
+      : choose_distance_(default_choose_distance)
       , pressed_(false)
    { }
    
@@ -57,6 +57,12 @@ namespace visualization {
       {
          (*chosen_)->on_move(pos);
       }
+      return true;
+   }
+   
+   bool interactive_viewer::on_zoom (float zoom)
+   {
+      choose_distance_ = default_choose_distance * zoom * zoom;
       return true;
    }
 

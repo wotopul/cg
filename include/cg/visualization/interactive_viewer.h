@@ -17,11 +17,14 @@ namespace visualization {
       bool on_press   (const point_2f & pos) override;
       bool on_release (const point_2f & pos) override;
       bool on_move    (const point_2f & pos) override;
+      bool on_zoom    (float zoom)           override;
 
    protected:
 
       std::vector<cg::visualization::interactive_type *> interactive_;
       float choose_distance_;
+      
+      static constexpr float default_choose_distance = 100.0; 
 
    private:     
 

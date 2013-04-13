@@ -16,6 +16,7 @@ namespace visualization
       virtual bool on_move        (point_2f const &)    { return false; }
       virtual bool on_press       (point_2f const &)    { return false; }
       virtual bool on_release     (point_2f const &)    { return false; }
+      virtual bool on_zoom        (float)               { return false; }
 
    protected:
       QWidget * get_wnd() const { return wnd_; }

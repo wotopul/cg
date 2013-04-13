@@ -141,9 +141,11 @@ void main_window_t::wheelEvent(QWheelEvent * e)
    e->accept();
 
    viewer_->on_move(limit(screen_to_global(e->pos())));
+   viewer_->on_zoom(zoom_);
 
    resize_impl(size().width(), size().height());
    updateGL();
+   
 }
 
 void main_window_t::mousePressEvent(QMouseEvent * e)
