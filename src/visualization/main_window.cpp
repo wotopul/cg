@@ -85,6 +85,8 @@ void main_window_t::resizeGL(int screen_w, int screen_h)
 void main_window_t::paintGL()
 {
    glClear(GL_COLOR_BUFFER_BIT);
+   
+   glEnable(GL_POINT_SMOOTH);
 
    glEnableClientState(GL_VERTEX_ARRAY);
    glEnableClientState(GL_COLOR_ARRAY);
