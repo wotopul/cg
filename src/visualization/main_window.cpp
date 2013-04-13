@@ -126,7 +126,7 @@ void main_window_t::wheelEvent(QWheelEvent * e)
    double old_zoom = zoom_;
 
    int delta = e->delta() / 8 / 15;
-   zoom_ *= pow(1.1, delta);
+   zoom_ *= pow(1.1, - delta);
 
    point_2f pos(e->pos().x(), e->pos().y());
    point_2f sz(size().width() / 2, size().height() / 2);
@@ -146,9 +146,9 @@ void main_window_t::wheelEvent(QWheelEvent * e)
 
 void main_window_t::mousePressEvent(QMouseEvent * e)
 {
-   if (e->button() == Qt::LeftButton && e->modifiers() == Qt::NoModifier)
+   if (e->button() == Qt::RightButton && e->modifiers() == Qt::NoModifier)
       start_point_ = limit(screen_to_global(e->pos()));
-   else if (e->button() == Qt::RightButton)
+   else if (e->button() == Qt::LeftButton)
    {
       if (viewer_->on_press(current_pos_))
       {
@@ -193,7 +193,7 @@ void main_window_t::mouseMoveEvent(QMouseEvent * e)
 
 void main_window_t::mouseReleaseEvent(QMouseEvent * e)
 {
-   if (e->button() == Qt::LeftButton)
+   if (e->button() == Qt::RightButton)
       start_point_ = boost::none;
    else if (viewer_->on_release(limit(screen_to_global(e->pos()))))
    {

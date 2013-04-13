@@ -40,12 +40,6 @@ struct sample_viewer : cg::visualization::viewer_adapter
          p.global_stream(pt + vector_2f(5, 0)) << pt;
    }
 
-   bool on_double_click(const point_2f & p)
-   {
-      points_.push_back(p);
-      return true;
-   }
-
    bool on_press(const point_2f & p)
    {
       if (current_point_)
@@ -59,7 +53,6 @@ struct sample_viewer : cg::visualization::viewer_adapter
    {
       if (!current_point_)
          return false;
-
 
       points_.push_back(*current_point_);
       current_point_.reset();
