@@ -11,15 +11,15 @@ namespace visualization {
    {
       typedef point_2t<Scalar> point_type;
       
-      point_type point;
-      
       interactive_primitive ( )
          : drag_(false)
       { }
       
       interactive_primitive (point_type point)
-         : point(std::move(point)), drag_(false)
+         : point_(std::move(point)), drag_(false)
       { }
+
+      point_type point ( ) const { return point_; }
       
       virtual void draw (drawer_type & drawer, bool chosen, QColor const & color) const override
       {
@@ -29,20 +29,20 @@ namespace visualization {
             drawer.set_color(default_choose_color());
          else
             drawer.set_color(color);
-         drawer.draw_point(point_2f(point.x, point.y), default_point_size);
+         drawer.draw_point(point_2f(point_.x, point_.y), default_point_size);
       }
       
       virtual float distance (point_2f const & pos) const override
       {
-         return (pos.x - point.x) * (pos.x - point.x) + (pos.y - point.y) * (pos.y - point.y);
+         return (pos.x - point_.x) * (pos.x - point_.x) + (pos.y - point_.y) * (pos.y - point_.y);
       }
       
-      virtual bool on_move    (point_2f const & pos) override
+      virtual bool on_move (point_2f const & pos) override
       {
          if (drag_)
          {
-            point.x = pos.x + drag_diff_.x;
-            point.y = pos.y + drag_diff_.y;
+            point_.x = pos.x + drag_diff_.x;
+            point_.y = pos.y + drag_diff_.y;
             return true;
          }
          return false;
@@ -51,8 +51,8 @@ namespace visualization {
       virtual bool on_press   (point_2f const & pos) override
       {
          drag_ = true;
-         drag_diff_.x = point.x - pos.x;
-         drag_diff_.y = point.y - pos.y;
+         drag_diff_.x = point_.x - pos.x;
+         drag_diff_.y = point_.y - pos.y;
          return true;
       }
       
@@ -63,6 +63,8 @@ namespace visualization {
       }
       
    private:
+      
+      point_type point_;
    
       bool drag_;
       point_2f drag_diff_;
