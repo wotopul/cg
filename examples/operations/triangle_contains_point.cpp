@@ -3,8 +3,8 @@
 
 #include <boost/optional.hpp>
 
-#include "cg/visualization/viewer_adapter.h"
-#include "cg/visualization/draw_util.h"
+#include "cg/visualization/interactive_viewer.h"
+#include "cg/visualization/interactive/triangle.h"
 
 #include "cg/io/point.h"
 
@@ -15,67 +15,30 @@
 
 using cg::point_2f;
 using cg::point_2;
+using cg::triangle_2;
 
 
-struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
+struct triangle_contains_point_viewer : cg::visualization::interactive_viewer
 {
    triangle_contains_point_viewer()
-      : t_(point_2(0, 0), point_2(100, 100), point_2(200, 0))
-   {}
-
-   void draw(cg::visualization::drawer_type & drawer) const
+      : triangle_(cg::triangle_2(cg::point_2(-100.0, -100.0), cg::point_2(0.0, 100.0), cg::point_2(100.0, -100.0)))
+      , point_(cg::point_2(0.0, 0.0))
    {
-      drawer.set_color(Qt::white);
-      if (current_point_ && cg::contains(t_, *current_point_))
-         drawer.set_color(Qt::green);
-
-      for (size_t l = 0, lp = 2; l != 3; lp = l++)
-         drawer.draw_line(t_[lp], t_[l]);
+      interactive_.push_back(&triangle_);
+      interactive_.push_back(&point_);
    }
 
    void print(cg::visualization::printer_type & p) const
    {
-      p.corner_stream() << "press mouse lbutton with CTRL key near triangle vertex to move it"
-                        << cg::visualization::endl
-                        << "if triangle is green triangle contains cursor point"
-                        << cg::visualization::endl;
+      if (cg::contains(triangle_.triangle(), point_.point()))
+         p.corner_stream() << "Triangle contains point" << cg::visualization::endl;
+      else
+         p.corner_stream() << "Triangle DOES NOT contain point" << cg::visualization::endl;
    }
-
-   bool on_press(const point_2f & p)
-   {
-      for (size_t l = 0; l != 3; ++l)
-      {
-         if (fabs(p.x - t_[l].x) < 4 && fabs(p.y - t_[l].y) < 4)
-         {
-            idx_ = l;
-            return true;
-         }
-      }
-
-      return false;
-   }
-
-   bool on_release(const point_2f & p)
-   {
-      idx_.reset();
-      return false;
-   }
-
-   bool on_move(const point_2f & p)
-   {
-      current_point_ = p;
-
-      if (!idx_)
-         return true;
-
-      t_[*idx_] = p;
-      return true;
-   }
-
+   
 private:
-   cg::triangle_2 t_;
-   boost::optional<size_t> idx_;
-   boost::optional<cg::point_2> current_point_;
+   cg::visualization::interactive_primitive<triangle_2> triangle_;
+   cg::visualization::interactive_primitive<point_2> point_;
 };
 
 int main(int argc, char ** argv)
