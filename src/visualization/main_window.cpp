@@ -91,16 +91,6 @@ void main_window_t::paintGL()
    glEnableClientState(GL_VERTEX_ARRAY);
    glEnableClientState(GL_COLOR_ARRAY);
 
-   for (std::pair<float, drawer_impl::point_buffer_t> const & buffer : drawer_.point_buffers)
-   {
-      glPointSize(buffer.first);
-
-      glVertexPointer (2, GL_FLOAT, 0, buffer.second.points.data());
-      glColorPointer  (3, GL_FLOAT, 0, buffer.second.colors.data());
-
-      glDrawArrays(GL_POINTS, 0, buffer.second.points.size() / 2);
-   }
-
    for (std::pair<float, drawer_impl::segment_buffer_t> const & buffer : drawer_.segment_buffers)
    {
       glLineWidth(buffer.first);
@@ -110,6 +100,16 @@ void main_window_t::paintGL()
 
       glDrawArrays(GL_LINES, 0, buffer.second.segments.size() / 2);
 
+   }
+
+   for (std::pair<float, drawer_impl::point_buffer_t> const & buffer : drawer_.point_buffers)
+   {
+      glPointSize(buffer.first);
+
+      glVertexPointer (2, GL_FLOAT, 0, buffer.second.points.data());
+      glColorPointer  (3, GL_FLOAT, 0, buffer.second.colors.data());
+
+      glDrawArrays(GL_POINTS, 0, buffer.second.points.size() / 2);
    }
 
    glDisableClientState(GL_VERTEX_ARRAY);
