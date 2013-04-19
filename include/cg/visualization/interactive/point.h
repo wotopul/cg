@@ -19,7 +19,8 @@ namespace visualization {
          : point_(std::move(point)), drag_(false)
       { }
 
-      point_type point ( ) const { return point_; }
+      point_type get_point ( ) const { return point_; }
+      void set_point (point_type point) { point_ = std::move(point); }
       
       virtual void draw (drawer_type & drawer, bool chosen, QColor const & color) const override
       {

@@ -31,7 +31,7 @@ struct sample_viewer : cg::visualization::interactive_viewer
    
    void print(cg::visualization::printer_type & p) const
    {
-      if (has_intersection(segment1_.segment(), segment2_.segment()))
+      if (has_intersection(segment1_.get_segment(), segment2_.get_segment()))
          p.corner_stream() << "Segments do intersect" << cg::visualization::endl;
       else
          p.corner_stream() << "Segments do NOT intersect" << cg::visualization::endl;

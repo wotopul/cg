@@ -18,43 +18,48 @@ namespace visualization {
       { }
       
       interactive_primitive (triangle_type const & triangle)
-         : p1_(triangle[0]), p2_(triangle[1]), p3_(triangle[2])
-      { }
-      
-      triangle_type triangle ( ) const
       {
-         return triangle_type(p1_.point(), p2_.point(), p3_.point());
+         set_triangle(triangle);
+      }
+      
+      triangle_type get_triangle ( ) const
+      {
+         return triangle_type(p_[0].get_point(), p_[1].get_point(), p_[2].get_point());
+      }
+      
+      void set_triangle (triangle_type const & triangle)
+      {
+         for (size_t i = 0; i < 3; ++i)
+            p_[i].set_point(triangle[i]);
       }
       
       virtual void draw (drawer_type & drawer, bool chosen, QColor const & color) const override
       {
          drawer.set_color(color);
-         drawer.draw_line(point_type(p1_.point().x, p1_.point().y), point_type(p2_.point().x, p2_.point().y), 1);
-         drawer.draw_line(point_type(p2_.point().x, p2_.point().y), point_type(p3_.point().x, p3_.point().y), 1);
-         drawer.draw_line(point_type(p3_.point().x, p3_.point().y), point_type(p1_.point().x, p1_.point().y), 1);
-         p1_.draw(drawer, chosen && (chosen_ && chosen_ == &p1_), color);
-         p2_.draw(drawer, chosen && (chosen_ && chosen_ == &p2_), color);
-         p3_.draw(drawer, chosen && (chosen_ && chosen_ == &p3_), color);
+         for (size_t i = 0; i < 3; ++i)
+            drawer.draw_line(point_type(p_[i].get_point().x, p_[i].get_point().y), point_type(p_[(i + 1) % 3].get_point().x, p_[(i + 1) % 3].get_point().y), 1);
+         for (size_t i = 0; i < 3; ++i)
+            p_[i].draw(drawer, chosen && (chosen_ == &p_[i]), color);
       }
       
       virtual float distance (point_2f const & pos) const override
       {
-         float d1 = p1_.distance(pos);
-         float d2 = p2_.distance(pos);
-         float d3 = p3_.distance(pos);
+         float d1 = p_[0].distance(pos);
+         float d2 = p_[1].distance(pos);
+         float d3 = p_[2].distance(pos);
          if (d1 < d2 && d1 < d3)
          {
-            chosen_ = const_cast<interactive_primitive<point_type> *>(&p1_);
+            chosen_ = const_cast<interactive_primitive<point_type> *>(&p_[0]);
             return d1;
          }
          else if (d2 < d3)
          {
-            chosen_ = const_cast<interactive_primitive<point_type> *>(&p2_);
+            chosen_ = const_cast<interactive_primitive<point_type> *>(&p_[1]);
             return d2;
          }
          else
          {
-            chosen_ = const_cast<interactive_primitive<point_type> *>(&p3_);
+            chosen_ = const_cast<interactive_primitive<point_type> *>(&p_[2]);
             return d3;
          }
       }
@@ -85,7 +90,7 @@ namespace visualization {
       
    private:
    
-      interactive_primitive<point_type> p1_, p2_, p3_;
+      interactive_primitive<point_type> p_[3];
    
       mutable interactive_primitive<point_type> * chosen_;
 

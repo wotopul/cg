@@ -30,7 +30,7 @@ struct triangle_contains_point_viewer : cg::visualization::interactive_viewer
 
    void print(cg::visualization::printer_type & p) const
    {
-      if (cg::contains(triangle_.triangle(), point_.point()))
+      if (cg::contains(triangle_.get_triangle(), point_.get_point()))
          p.corner_stream() << "Triangle contains point" << cg::visualization::endl;
       else
          p.corner_stream() << "Triangle DOES NOT contain point" << cg::visualization::endl;

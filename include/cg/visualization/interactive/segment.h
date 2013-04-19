@@ -15,23 +15,31 @@ namespace visualization {
       typedef point_2t<Scalar> point_type;
       
       interactive_primitive ( )
+        : chosen_(nullptr)
       { }
       
       interactive_primitive (segment_type const & segment)
          : beg_(segment[0]), end_(segment[1])
+         , chosen_(nullptr)
       { }
       
-      segment_type segment ( ) const
+      segment_type get_segment ( ) const
       {
-         return segment_type(beg_.point(), end_.point());
+         return segment_type(beg_.get_point(), end_.get_point());
+      }
+      
+      void set_segment (segment_type const & segment)
+      {
+          beg_.set_point(segment[0]);
+          end_.set_point(segment[1]);
       }
       
       virtual void draw (drawer_type & drawer, bool chosen, QColor const & color) const override
       {
          drawer.set_color(color);
-         drawer.draw_line(point_type(beg_.point().x, beg_.point().y), point_type(end_.point().x, end_.point().y), 1);
-         beg_.draw(drawer, chosen && (chosen_ && chosen_ == &beg_), color);
-         end_.draw(drawer, chosen && (chosen_ && chosen_ == &end_), color);
+         drawer.draw_line(point_type(beg_.get_point().x, beg_.get_point().y), point_type(end_.get_point().x, end_.get_point().y), 1);
+         beg_.draw(drawer, chosen && (chosen_ == &beg_), color);
+         end_.draw(drawer, chosen && (chosen_ == &end_), color);
       }
       
       virtual float distance (point_2f const & pos) const override
