@@ -37,7 +37,7 @@ namespace visualization {
       {
          drawer.set_color(color);
          for (size_t i = 0; i < 3; ++i)
-            drawer.draw_line(point_type(p_[i].get_point().x, p_[i].get_point().y), point_type(p_[(i + 1) % 3].get_point().x, p_[(i + 1) % 3].get_point().y), 1);
+            drawer.draw_line(p_[i].get_point(), p_[(i + 1) % 3].get_point(), 1);
          for (size_t i = 0; i < 3; ++i)
             p_[i].draw(drawer, chosen && (chosen_ == &p_[i]), color);
       }

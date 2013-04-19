@@ -37,7 +37,7 @@ namespace visualization {
       virtual void draw (drawer_type & drawer, bool chosen, QColor const & color) const override
       {
          drawer.set_color(color);
-         drawer.draw_line(point_type(beg_.get_point().x, beg_.get_point().y), point_type(end_.get_point().x, end_.get_point().y), 1);
+         drawer.draw_line(beg_.get_point(), end_.get_point(), 1);
          beg_.draw(drawer, chosen && (chosen_ == &beg_), color);
          end_.draw(drawer, chosen && (chosen_ == &end_), color);
       }
