@@ -218,6 +218,17 @@ void main_window_t::mouseDoubleClickEvent(QMouseEvent * event)
    }
 }
 
+void main_window_t::keyPressEvent(QKeyEvent * event)
+{
+   if (viewer_->on_key_press(event->key()))
+   {
+      drawer_.clear();
+      viewer_->draw(drawer_);
+      updateGL();
+   }
+   event->accept();
+}
+
 void main_window_t::keyReleaseEvent(QKeyEvent * event)
 {
    if ((event->key() == Qt::Key_C) && (event->modifiers() == Qt::ControlModifier))
@@ -237,7 +248,7 @@ void main_window_t::keyReleaseEvent(QKeyEvent * event)
       auto txt = boost::lexical_cast<std::string>(current_pos_);
       QApplication::clipboard()->setText(txt.c_str());
    }
-   else if (viewer_->on_key(event->key()))
+   else if (viewer_->on_key_release(event->key()))
    {
       drawer_.clear();
       viewer_->draw(drawer_);

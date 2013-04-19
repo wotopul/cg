@@ -57,7 +57,8 @@ namespace visualization
 
       virtual void set_window(QWidget *)                      = 0;
 
-      virtual bool on_key         (int key)                   = 0;
+      virtual bool on_key_press   (int key)                   = 0;
+      virtual bool on_key_release (int key)                   = 0;
       virtual bool on_double_click(point_2f const & pos)      = 0;
       virtual bool on_move        (point_2f const & pos)      = 0;
       virtual bool on_press       (point_2f const & pos)      = 0;
