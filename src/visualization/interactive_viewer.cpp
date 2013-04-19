@@ -14,7 +14,7 @@ namespace visualization {
          i_ptr->draw(drawer, (chosen_ && i_ptr == *chosen_), Qt::white);
    }
 
-   bool interactive_viewer::on_press(const point_2f & pos)
+   bool interactive_viewer::on_mouse_press(const point_2f & pos)
    {
       pressed_ = true;
       if (chosen_)
@@ -25,7 +25,7 @@ namespace visualization {
       return false;
    }
 
-   bool interactive_viewer::on_release(const point_2f & pos)
+   bool interactive_viewer::on_mouse_release(const point_2f & pos)
    {
       pressed_ = false;
       if (chosen_)
@@ -36,7 +36,7 @@ namespace visualization {
       return false;
    }
 
-   bool interactive_viewer::on_move(const point_2f & pos)
+   bool interactive_viewer::on_mouse_move(const point_2f & pos)
    {
       if (!pressed_)
       {

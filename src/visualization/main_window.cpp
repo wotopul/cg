@@ -140,7 +140,7 @@ void main_window_t::wheelEvent(QWheelEvent * e)
 
    e->accept();
 
-   viewer_->on_move(limit(screen_to_global(e->pos())));
+   viewer_->on_mouse_move(limit(screen_to_global(e->pos())));
    viewer_->on_zoom(zoom_);
 
    resize_impl(size().width(), size().height());
@@ -154,7 +154,7 @@ void main_window_t::mousePressEvent(QMouseEvent * e)
       start_point_ = limit(screen_to_global(e->pos()));
    else if (e->button() == Qt::LeftButton)
    {
-      if (viewer_->on_press(current_pos_))
+      if (viewer_->on_mouse_press(current_pos_))
       {
          drawer_.clear();
          viewer_->draw(drawer_);
@@ -186,7 +186,7 @@ void main_window_t::mouseMoveEvent(QMouseEvent * e)
 
       resize_impl(w, h);
    }
-   else if (viewer_->on_move(current_pos_))
+   else if (viewer_->on_mouse_move(current_pos_))
    {
       drawer_.clear();
       viewer_->draw(drawer_);
@@ -199,7 +199,7 @@ void main_window_t::mouseReleaseEvent(QMouseEvent * e)
 {
    if (e->button() == Qt::RightButton)
       start_point_ = boost::none;
-   else if (viewer_->on_release(limit(screen_to_global(e->pos()))))
+   else if (viewer_->on_mouse_release(limit(screen_to_global(e->pos()))))
    {
       drawer_.clear();
       viewer_->draw(drawer_);

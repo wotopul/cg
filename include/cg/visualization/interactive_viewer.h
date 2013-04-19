@@ -14,10 +14,10 @@ namespace visualization {
 
       void draw(cg::visualization::drawer_type & drawer) const override;
       
-      bool on_press   (const point_2f & pos) override;
-      bool on_release (const point_2f & pos) override;
-      bool on_move    (const point_2f & pos) override;
-      bool on_zoom    (float zoom)           override;
+      bool on_mouse_move    (const point_2f & pos) override;
+      bool on_mouse_press   (const point_2f & pos) override;
+      bool on_mouse_release (const point_2f & pos) override;
+      bool on_zoom          (float zoom)           override;
 
    protected:
 
