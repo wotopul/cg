@@ -17,7 +17,7 @@ set(SOURCES
 )
 
 add_executable(cg-test ${SOURCES})
-target_link_libraries(cg-test ${GTEST_BOTH_LIBRARIES} ${GMP_LIBRARIES})
+target_link_libraries(cg-test ${GTEST_BOTH_LIBRARIES} ${GMP_LIBRARIES} /usr/lib/x86_64-linux-gnu/libpthread.so)
 
 file(GLOB_RECURSE HEADERS "*.h")
 add_custom_target(cg_test_headers SOURCES ${HEADERS})
