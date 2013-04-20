@@ -10,6 +10,7 @@
 
 #include <cg/primitives/point.h>
 #include <cg/convex_hull/graham.h>
+#include <cg/convex_hull/andrews.h>
 
 using cg::point_2f;
 using cg::point_2;
