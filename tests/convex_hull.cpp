@@ -32,12 +32,21 @@ TEST(convex_hull, simple)
 {
    using cg::point_2;
 
-   std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
-                                                    (point_2(1, 0))
-                                                    (point_2(0, 1))
-                                                    (point_2(2, 0))
-                                                    (point_2(0, 2))
-                                                    (point_2(3, 0));
+   std::vector<point_2> pts {
+      {0, 0},
+      {1, 0},
+      {0, 1},
+      {2, 0},
+      {0, 2},
+      {3, 0}
+   };
+
+//   std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
+//                                                    (point_2(1, 0))
+//                                                    (point_2(0, 1))
+//                                                    (point_2(2, 0))
+//                                                    (point_2(0, 2))
+//                                                    (point_2(3, 0));
 
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
 }
