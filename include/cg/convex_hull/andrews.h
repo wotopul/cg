@@ -64,19 +64,19 @@ namespace cg
 //      std::cout << "------\n";
 
 
-      for (auto i = begin; i != end; ++i)
-      {
-         std::cout << *i << std::endl;
-      }
-      std::cout << "------\n";
+//      for (auto i = begin; i != end; ++i)
+//      {
+//         std::cout << *i << std::endl;
+//      }
+//      std::cout << "------\n";
 
       BidItr t = contour_graham_hull(begin, end);
 
-      for (auto i = begin; i != t; ++i)
-      {
-         std::cout << *i << std::endl;
-      }
-      std::cout << "------\n";
+//      for (auto i = begin; i != t; ++i)
+//      {
+//         std::cout << *i << std::endl;
+//      }
+//      std::cout << "------\n";
 
       return t;
    }

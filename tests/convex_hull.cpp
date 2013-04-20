@@ -113,10 +113,43 @@ TEST(andrews_hull, s1)
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
 }
 
-//TEST(andrews_hull, uniform)
-//{
-//   using cg::point_2;
+TEST(andrews_hull, uniform)
+{
+   using cg::point_2;
 
-//   std::vector<point_2> pts = uniform_points(5);
-//   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
-//}
+   std::vector<point_2> pts = uniform_points(1000);
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(andrews_hull, one)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(andrews_hull, two)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}, {1, 0}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(andrews_hull, two_same)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}, {0, 0}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
+}

@@ -40,8 +40,13 @@ namespace cg
          }
       }
 
-      if (orientation(*pt, *t, *b) == CG_COLLINEAR)
-         --t;
+//      if (orientation(*pt, *t, *b) == CG_COLLINEAR)
+//         --t;
+
+      while(orientation(*pt, *t, *b) != CG_LEFT)
+      {
+         t = pt--;
+      }
 
       return ++t;
    }
