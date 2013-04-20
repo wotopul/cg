@@ -6,7 +6,7 @@
 
 inline std::vector<cg::point_2> uniform_points(size_t count)
 {
-    util::uniform_random_int<int> rand(0, 100);
+    util::uniform_random_real<double> rand(-10000., 10000.);
 
     std::vector<cg::point_2> res(count);
 
@@ -14,8 +14,8 @@ inline std::vector<cg::point_2> uniform_points(size_t count)
     {
 //        rand >> res[l].x;
 //        rand >> res[l].y;
-       res[l].x = (double) rand();
-       res[l].y = (double) rand();
+       res[l].x = rand();
+       res[l].y = rand();
     }
 
     return res;
