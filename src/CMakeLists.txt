@@ -4,7 +4,6 @@ set(VISUALIZATION_SOURCES
    visualization/main_window.cpp
    visualization/visualization.cpp
    visualization/draw_util.cpp
-   visualization/interactive_viewer.cpp
 )
 
 include_directories(.)

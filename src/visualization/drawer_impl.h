@@ -2,8 +2,6 @@
 
 #include <QtOpenGL>
 
-#include <unordered_map>
-
 #include "cg/visualization/viewer.h"
 
 namespace cg {
@@ -26,16 +24,18 @@ namespace visualization
       {
          std::vector<GLfloat>    points;
          std::vector<GLfloat>    colors;
+         float radius;
       };
 
       struct segment_buffer_t
       {
          std::vector<GLfloat>    segments;
          std::vector<GLfloat>    colors;
+         float width;
       };
 
-      std::unordered_map<float, point_buffer_t>     point_buffers;
-      std::unordered_map<float, segment_buffer_t>   segment_buffers;
+      std::vector<point_buffer_t>     point_buffers;
+      std::vector<segment_buffer_t>   segment_buffers;
 
    private:
       QColor current_color_;
