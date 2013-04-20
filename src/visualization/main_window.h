@@ -18,12 +18,13 @@ private:
    void resizeGL(int, int);
    void paintGL();
 
-   void wheelEvent(QWheelEvent *);
-   void mousePressEvent(QMouseEvent *);
-   void mouseDoubleClickEvent(QMouseEvent *);
-   void mouseMoveEvent(QMouseEvent *);
-   void mouseReleaseEvent(QMouseEvent *);
-   void keyReleaseEvent(QKeyEvent *);
+   void wheelEvent(QWheelEvent *) override;
+   void mousePressEvent(QMouseEvent *) override;
+   void mouseDoubleClickEvent(QMouseEvent *) override;
+   void mouseMoveEvent(QMouseEvent *) override;
+   void mouseReleaseEvent(QMouseEvent *) override;
+   void keyPressEvent(QKeyEvent *) override;
+   void keyReleaseEvent(QKeyEvent *) override;
 
    void resize_impl(int, int);
    point_2f screen_to_global(QPoint const & screen_pos) const;

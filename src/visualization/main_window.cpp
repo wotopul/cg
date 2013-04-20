@@ -85,38 +85,35 @@ void main_window_t::resizeGL(int screen_w, int screen_h)
 void main_window_t::paintGL()
 {
    glClear(GL_COLOR_BUFFER_BIT);
+   
+   glEnable(GL_POINT_SMOOTH);
 
-   for (drawer_impl::point_buffer_t const & buffer : drawer_.point_buffers)
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glEnableClientState(GL_COLOR_ARRAY);
+
+   for (std::pair<float, drawer_impl::segment_buffer_t> const & buffer : drawer_.segment_buffers)
    {
-      glPointSize(buffer.radius);
+      glLineWidth(buffer.first);
 
-      glEnableClientState(GL_VERTEX_ARRAY);
-      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer (2, GL_FLOAT, 0, buffer.second.segments.data());
+      glColorPointer  (3, GL_FLOAT, 0, buffer.second.colors.data());
 
-      glVertexPointer (2, GL_FLOAT, 0, &buffer.points[0]);
-      glColorPointer  (3, GL_FLOAT, 0, &buffer.colors[0]);
+      glDrawArrays(GL_LINES, 0, buffer.second.segments.size() / 2);
 
-      glDrawArrays(GL_POINTS, 0, buffer.points.size() / 2);
-
-      glDisableClientState(GL_VERTEX_ARRAY);
-      glDisableClientState(GL_COLOR_ARRAY);
    }
 
-   for (drawer_impl::segment_buffer_t const & buffer : drawer_.segment_buffers)
+   for (std::pair<float, drawer_impl::point_buffer_t> const & buffer : drawer_.point_buffers)
    {
-      glLineWidth(buffer.width);
+      glPointSize(buffer.first);
 
-      glEnableClientState(GL_VERTEX_ARRAY);
-      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer (2, GL_FLOAT, 0, buffer.second.points.data());
+      glColorPointer  (3, GL_FLOAT, 0, buffer.second.colors.data());
 
-      glVertexPointer (2, GL_FLOAT, 0, &buffer.segments[0]);
-      glColorPointer  (3, GL_FLOAT, 0, &buffer.colors[0]);
-
-      glDrawArrays(GL_LINES, 0, buffer.segments.size() / 2);
-
-      glDisableClientState(GL_VERTEX_ARRAY);
-      glDisableClientState(GL_COLOR_ARRAY);
+      glDrawArrays(GL_POINTS, 0, buffer.second.points.size() / 2);
    }
+
+   glDisableClientState(GL_VERTEX_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
 
    printer_impl printer(   boost::bind(&main_window_t::draw_string,        this, _1, _2),
                            boost::bind(&main_window_t::draw_string_global, this, _1, _2)   );
@@ -131,16 +128,7 @@ void main_window_t::wheelEvent(QWheelEvent * e)
    double old_zoom = zoom_;
 
    int delta = e->delta() / 8 / 15;
-   if (delta > 0)
-   {
-      for (int i = 0; i != delta; ++i)
-         zoom_ *= 1.1;
-   }
-   else if (delta < 0)
-   {
-      for (int i = 0; i != delta; --i)
-         zoom_ /= 1.1;
-   }
+   zoom_ *= pow(1.1, - delta);
 
    point_2f pos(e->pos().x(), e->pos().y());
    point_2f sz(size().width() / 2, size().height() / 2);
@@ -152,19 +140,21 @@ void main_window_t::wheelEvent(QWheelEvent * e)
 
    e->accept();
 
-   viewer_->on_move(limit(screen_to_global(e->pos())));
+   viewer_->on_mouse_move(limit(screen_to_global(e->pos())));
+   viewer_->on_zoom(zoom_);
 
    resize_impl(size().width(), size().height());
    updateGL();
+   
 }
 
 void main_window_t::mousePressEvent(QMouseEvent * e)
 {
-   if (e->button() == Qt::LeftButton && e->modifiers() == Qt::NoModifier)
+   if (e->button() == Qt::RightButton && e->modifiers() == Qt::NoModifier)
       start_point_ = limit(screen_to_global(e->pos()));
-   else if (e->button() == Qt::RightButton)
+   else if (e->button() == Qt::LeftButton)
    {
-      if (viewer_->on_press(current_pos_))
+      if (viewer_->on_mouse_press(current_pos_))
       {
          drawer_.clear();
          viewer_->draw(drawer_);
@@ -196,7 +186,7 @@ void main_window_t::mouseMoveEvent(QMouseEvent * e)
 
       resize_impl(w, h);
    }
-   else if (viewer_->on_move(current_pos_))
+   else if (viewer_->on_mouse_move(current_pos_))
    {
       drawer_.clear();
       viewer_->draw(drawer_);
@@ -207,9 +197,9 @@ void main_window_t::mouseMoveEvent(QMouseEvent * e)
 
 void main_window_t::mouseReleaseEvent(QMouseEvent * e)
 {
-   if (e->button() == Qt::LeftButton)
+   if (e->button() == Qt::RightButton)
       start_point_ = boost::none;
-   else if (viewer_->on_release(limit(screen_to_global(e->pos()))))
+   else if (viewer_->on_mouse_release(limit(screen_to_global(e->pos()))))
    {
       drawer_.clear();
       viewer_->draw(drawer_);
@@ -226,6 +216,17 @@ void main_window_t::mouseDoubleClickEvent(QMouseEvent * event)
       viewer_->draw(drawer_);
       updateGL();
    }
+}
+
+void main_window_t::keyPressEvent(QKeyEvent * event)
+{
+   if (viewer_->on_key_press(event->key()))
+   {
+      drawer_.clear();
+      viewer_->draw(drawer_);
+      updateGL();
+   }
+   event->accept();
 }
 
 void main_window_t::keyReleaseEvent(QKeyEvent * event)
@@ -247,7 +248,7 @@ void main_window_t::keyReleaseEvent(QKeyEvent * event)
       auto txt = boost::lexical_cast<std::string>(current_pos_);
       QApplication::clipboard()->setText(txt.c_str());
    }
-   else if (viewer_->on_key(event->key()))
+   else if (viewer_->on_key_release(event->key()))
    {
       drawer_.clear();
       viewer_->draw(drawer_);
