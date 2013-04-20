@@ -5,6 +5,7 @@
 #include <cg/convex_hull/graham.h>
 #include <cg/convex_hull/andrew.h>
 #include <cg/operations/contains/segment_point.h>
+#include <cg/convex_hull/quick_hull.h>
 
 #include "random_utils.h"
 
@@ -159,3 +160,26 @@ TEST(andrew_hull, uniform1)
       }
    }
 }
+
+TEST(quick_hull, simple)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
+                                                    (point_2(1, 0))
+                                                    (point_2(0, 1))
+                                                    (point_2(2, 0))
+                                                    (point_2(0, 2))
+                                                    (point_2(3, 0));
+
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(quick_hull, uniform)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts = uniform_points(10000000);
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
+}
+
