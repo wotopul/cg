@@ -54,7 +54,7 @@ namespace cg
          }
       }
 
-      while(orientation(*pt, *t, *b) != CG_LEFT)
+      while(pt != b && orientation(*pt, *t, *b) != CG_LEFT)
       {
          t = pt--;
       }
@@ -69,8 +69,6 @@ namespace cg
       {
          return p;
       }
-
-      q = std::unique(p, q);
 
       std::iter_swap(p, std::min_element(p, q));
 
@@ -94,6 +92,8 @@ namespace cg
          case CG_COLLINEAR:
             return a < b;
          }
+         // Suppress warning
+         return false;
       });
 
       return contour_graham_hull(t, q);
