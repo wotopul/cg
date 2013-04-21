@@ -73,6 +73,40 @@ TEST(convex_hull, uniform)
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
 }
 
+
+TEST(convex_hull, three_with_same)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}, {0, 0}, {-1, 1}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(convex_hull, three_with_same_2)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}, {1, 0}, {0, 0}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(convex_hull, line)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}, {1, 0}, {2, 0}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
+}
+
 TEST(andrews_hull, simple)
 {
    using cg::point_2;
@@ -153,3 +187,37 @@ TEST(andrews_hull, two_same)
    };
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
 }
+
+TEST(andrews_hull, three_with_same)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}, {0, 0}, {-1, 1}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(andrews_hull, three_with_same_2)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}, {1, 0}, {0, 0}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(andrews_hull, line)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts =
+   {
+      {0, 0}, {1, 0}, {2, 0}
+   };
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::andrews(pts.begin(), pts.end()), pts.end()));
+}
+

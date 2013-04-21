@@ -18,6 +18,8 @@ namespace cg
          return begin;
       }
 
+      end = std::unique(begin, end);
+
       std::iter_swap(begin, std::max_element(begin, end));
 
       BidItr second = ++begin;
