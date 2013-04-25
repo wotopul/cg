@@ -15,11 +15,11 @@ namespace cg
          if (min_point.y > max_point.y)
             std::swap(min_point, max_point);
          int orient = orientation(min_point, max_point, b);
-         if (orient == 0 && std::min(min_point, max_point) <= b && b <= std::max(min_point, max_point))
+         if (orient == CG_COLLINEAR && std::min(min_point, max_point) <= b && b <= std::max(min_point, max_point))
             return true;
          if (max_point.y <= b.y || min_point.y > b.y)
             continue;
-         if (orient > 0)
+         if (orient == CG_LEFT)
             num_intersections++;
       }
       return num_intersections % 2;
