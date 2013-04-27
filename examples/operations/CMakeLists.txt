@@ -13,3 +13,6 @@ target_link_libraries(contour_contains_point visualization ${GMP_LIBRARIES})
 
 add_executable(segment_intersects_triangle segment_intersects_triangle.cpp)
 target_link_libraries(segment_intersects_triangle visualization ${GMP_LIBRARIES})
+
+add_executable(segment_intersects_rectangle segment_intersects_rectangle.cpp)
+target_link_libraries(segment_intersects_rectangle visualization ${GMP_LIBRARIES})
