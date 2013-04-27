@@ -4,8 +4,9 @@
 
 #include <cg/operations/orientation.h>
 
-template<class BidItr>
-BidItr quick_hull(BidItr begin, BidItr end)
+namespace cg
 {
 
+   template<class Itr>
+   Itr quick_hull(Itr begin, Itr end);
 }
