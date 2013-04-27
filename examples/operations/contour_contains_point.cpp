@@ -24,7 +24,7 @@ struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
       : contour(std::vector<point_2>({point_2(0, 0), point_2(100, 100), point_2(200, 0)}))
    {}
 
-   void draw(cg::visualization::drawer_type & drawer) const
+   void draw(cg::visualization::drawer_type & drawer) const override
    {
       drawer.set_color(Qt::white);
       if (current_point_ && cg::contains(contour, *current_point_))
@@ -32,9 +32,12 @@ struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
 
       for (size_t l = 0, lp = contour.size() - 1; l != contour.size(); lp = l++)
          drawer.draw_line(contour[lp], contour[l]);
+
+      if (idx_)
+         drawer.draw_point(contour[*idx_], 5);
    }
 
-   void print(cg::visualization::printer_type & p) const
+   void print(cg::visualization::printer_type & p) const override
    {
       p.corner_stream() << "press mouse lbutton with CTRL key near contour vertex to move it"
                         << cg::visualization::endl
@@ -42,7 +45,7 @@ struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
                         << cg::visualization::endl;
    }
 
-   bool on_press(const point_2f & p)
+   bool on_press(const point_2f & p) override
    {
       for (size_t l = 0; l != contour.size(); ++l)
       {
@@ -58,13 +61,13 @@ struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
       return false;
    }
 
-   bool on_release(const point_2f & p)
+   bool on_release(const point_2f & p) override
    {
       idx_.reset();
       return false;
    }
 
-   bool on_move(const point_2f & p)
+   bool on_move(const point_2f & p) override
    {
       current_point_ = p;
 
@@ -85,5 +88,5 @@ int main(int argc, char ** argv)
 {
    QApplication app(argc, argv);
    triangle_contains_point_viewer viewer;
-   cg::visualization::run_viewer(&viewer, "triangle contains point");
+   cg::visualization::run_viewer(&viewer, "Contour contains point");
 }
