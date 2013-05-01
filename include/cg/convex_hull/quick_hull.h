@@ -99,7 +99,7 @@ namespace cg
             return end;
         }
 
-        RanIter highest_point_iter = std::max_element(begin, end, [begin, last_point](point_2 const &largest, point_2 const &first)
+        RanIter highest_point_iter = std::max_element(begin, end, [begin, &last_point](point_2 const &largest, point_2 const &first)
         {
                 return pred(largest, first, *begin, last_point) == CG_RIGHT;
         });
@@ -112,12 +112,12 @@ namespace cg
         }
         std::iter_swap(begin + 1, highest_point_iter);
 
-        RanIter first = std::partition(begin + 2, end, [begin, highest_point](const point_2 &point)
+        RanIter first = std::partition(begin + 2, end, [begin, &highest_point](const point_2 &point)
         {
             return orientation(*begin, highest_point, point) == CG_RIGHT;
         });
 
-        RanIter second = std::partition(first, end, [highest_point, last_point](const point_2 &point)
+        RanIter second = std::partition(first, end, [&highest_point, &last_point](const point_2 &point)
         {
             return orientation(highest_point, last_point, point) == CG_RIGHT;
         });
