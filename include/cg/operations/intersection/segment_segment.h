@@ -130,7 +130,7 @@ namespace cg
          ab[l] = orientation ( a[0], a[1], b[l] );
 
       if ( ab[0] == ab[1] && ab[0] == CG_COLLINEAR ) {
-         point_2 beg = std::max ( min ( a ), max ( b ) );
+         point_2 beg = std::max ( min ( a ), min ( b ) );
          point_2 end = std::min ( max ( a ), max ( b ) );
 
          if ( beg == end ) return b;
