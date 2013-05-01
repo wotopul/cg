@@ -6,7 +6,7 @@
 #include "random_utils.h"
 
 using namespace cg;
-const int EPS_PWR = -100;
+const int EPS_PWR = -300;
 
 TEST ( intersection, simple )
 {
