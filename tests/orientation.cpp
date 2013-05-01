@@ -14,7 +14,7 @@ TEST(orientation, uniform_line)
 {
    uniform_random_real<double, std::mt19937> distr(-(1LL << 53), (1LL << 53));
 
-   std::vector<cg::point_2> pts = uniform_points(1000);
+   std::vector<cg::point_2> pts = uniform_points(100);
    util::perftest::performance_profiler pp1("external");
    for (size_t l = 0, ln = 1; ln < pts.size(); l = ln++)
    {
