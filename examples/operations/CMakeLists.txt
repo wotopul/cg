@@ -16,3 +16,12 @@ target_link_libraries(segment_intersects_triangle visualization ${GMP_LIBRARIES}
 
 add_executable(segment_intersects_rectangle segment_intersects_rectangle.cpp)
 target_link_libraries(segment_intersects_rectangle visualization ${GMP_LIBRARIES})
+
+add_executable(segments_intersect segments_intersect.cpp)
+target_link_libraries(segments_intersect visualization ${GMP_LIBRARIES})
+
+add_executable(triangle_intersects_segment triangle_intersects_segment.cpp)
+target_link_libraries(triangle_intersects_segment visualization ${GMP_LIBRARIES})
+
+add_executable(rectangle_intersects_segment rectangle_intersects_segment.cpp)
+target_link_libraries(rectangle_intersects_segment visualization ${GMP_LIBRARIES})

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/range/algorithm/sort.hpp>
+#include <algorithm>
 
 #include <cg/operations/orientation.h>
 
@@ -45,7 +45,6 @@ namespace cg
                std::iter_swap(t, p++);
                break;
             }
-
             t = pt--;
             break;
 
@@ -54,16 +53,14 @@ namespace cg
          }
       }
 
-      while(pt != b && orientation(*pt, *t, *b) != CG_LEFT)
-      {
+      while (pt != b && orientation(*pt, *t, *b) != CG_LEFT)
          t = pt--;
-      }
 
       return ++t;
    }
 
-   template <class BidIter>
-   BidIter graham_hull(BidIter p, BidIter q)
+   template <class RandIter>
+   RandIter graham_hull(RandIter p, RandIter q)
    {
       if (p == q)
       {
@@ -72,7 +69,7 @@ namespace cg
 
       std::iter_swap(p, std::min_element(p, q));
 
-      BidIter t = p++;
+      RandIter t = p++;
 
       if (p == q)
       {

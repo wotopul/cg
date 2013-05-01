@@ -31,6 +31,12 @@ struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
 
       for (size_t l = 0, lp = 2; l != 3; lp = l++)
          drawer.draw_line(t_[lp], t_[l]);
+
+	  if (idx_)
+	  {
+		  drawer.set_color((rbutton_pressed_)? Qt::red : Qt::yellow);
+		  drawer.draw_point(t_[*idx_], 5);
+	  }
    }
 
    void print(cg::visualization::printer_type & p) const
@@ -43,6 +49,7 @@ struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
 
    bool on_press(const point_2f & p)
    {
+      rbutton_pressed_ = true;
       for (size_t l = 0; l != 3; ++l)
       {
          if (fabs(p.x - t_[l].x) < 4 && fabs(p.y - t_[l].y) < 4)
@@ -57,6 +64,7 @@ struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
 
    bool on_release(const point_2f & p)
    {
+      rbutton_pressed_ = false;
       idx_.reset();
       return false;
    }
@@ -73,9 +81,26 @@ struct triangle_contains_point_viewer : cg::visualization::viewer_adapter
    }
 
 private:
+   bool set_idx (const point_2f & p)
+   {
+      idx_.reset();
+      float max_r;
+      for (size_t l = 0; l != 3; ++l)
+      {
+         float current_r = (p.x - t_[l].x) * (p.x - t_[l].x) + (p.y - t_[l].y) * (p.y - t_[l].y);
+         if ((idx_ && current_r < max_r) || (!idx_ && current_r < 100))
+         {
+            idx_ = l;
+            max_r = current_r;
+         }
+      }
+      return idx_;
+   }
+
    cg::triangle_2 t_;
    boost::optional<size_t> idx_;
    boost::optional<cg::point_2> current_point_;
+   bool rbutton_pressed_ = false;
 };
 
 int main(int argc, char ** argv)

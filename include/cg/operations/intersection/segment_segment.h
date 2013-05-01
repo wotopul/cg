@@ -18,9 +18,13 @@ namespace cg
    {
       bool same_hotpixel ( double a, double b, double bound )
       {
-
-         double hp1 = floor ( a / bound );
-         double hp2 = floor ( b / bound );
+         double ar = a / bound, br = b / bound;
+         
+         if (isinf(ar) || isinf(br) || isnan(ar) || isnan(br))
+            return false;
+         
+         double hp1 = floor ( ar );
+         double hp2 = floor ( br );
 
          return hp1 == hp2;
       }
@@ -74,7 +78,7 @@ namespace cg
 
          double bound = pow ( 2.0, eps_pwr );
          
-         std::cout << "int_d: (" << x << ", " << y << ")" << std::endl;
+         //std::cout << "int_d: (" << x << ", " << y << ")" << std::endl;
 
          if ( same_hotpixel ( x - x_eps, x + x_eps, bound ) && same_hotpixel ( y - y_eps, y + y_eps, bound ) )
             return point_2 ( x, y );
@@ -95,8 +99,8 @@ namespace cg
 
          double bound = pow ( 2.0, eps_pwr );
 
-         std::cout << "int_i: x=[" << res.x.lower() << ", " << res.x.upper() << "]\n";
-         std::cout << "int_i: y=[" << res.y.lower() << ", " << res.y.upper() << "]" << std::endl;
+         /*std::cout << "int_i: x=[" << res.x.lower() << ", " << res.x.upper() << "]\n";
+         std::cout << "int_i: y=[" << res.y.lower() << ", " << res.y.upper() << "]" << std::endl;*/
          
          if ( same_hotpixel ( res.x.lower(), res.x.upper(), bound )
                && same_hotpixel ( res.y.lower(), res.y.upper(), bound ) )
@@ -110,7 +114,7 @@ namespace cg
          segment_2t<mpq_class> a_r {{a[0].x, a[0].y}, {a[1].x, a[1].y}};
          segment_2t<mpq_class> b_r {{b[0].x, b[0].y}, {b[1].x, b[1].y}};
          auto result = segment_intersection_impl ( a_r, b_r );
-         std::cout << "int_r: (" << result.x.get_d() << ", " << result.y.get_d() << ")" << std::endl;
+        /*std::cout << "int_r: (" << result.x.get_d() << ", " << result.y.get_d() << ")" << std::endl;*/
          return point_2 ( result.x.get_d(), result.y.get_d() );
       }
    }
@@ -147,7 +151,7 @@ namespace cg
       /*auto res_d = detail::intersection_d ( a, b, eps_pwr );
       if ( res_d.is_initialized() ) {
          return *res_d;
-      }*/
+      } */
 
       auto res = detail::intersection_i ( a, b, eps_pwr );
       if (res) {
