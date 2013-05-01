@@ -19,8 +19,8 @@ namespace cg
       bool same_hotpixel ( double a, double b, double bound )
       {
 
-         int hp1 = floor ( a / bound );
-         int hp2 = floor ( b / bound );
+         double hp1 = floor ( a / bound );
+         double hp2 = floor ( b / bound );
 
          return hp1 == hp2;
       }
@@ -144,10 +144,10 @@ namespace cg
       }
 
       std::cout.precision(20);
-      auto res_d = detail::intersection_d ( a, b, eps_pwr );
+      /*auto res_d = detail::intersection_d ( a, b, eps_pwr );
       if ( res_d.is_initialized() ) {
          return *res_d;
-      }
+      }*/
 
       auto res = detail::intersection_i ( a, b, eps_pwr );
       if (res) {
