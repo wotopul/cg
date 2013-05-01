@@ -137,23 +137,22 @@ namespace cg
             return end;
         }
 
-        std::pair<RanIter, RanIter> min_max = std::minmax_element(begin, end);
-        point_2 min_point = *min_max.first;
-        point_2 max_point = *min_max.second;
-        if (min_point == max_point)
+        std::iter_swap(begin, std::min_element(begin, end));
+        std::iter_swap(end - 1, std::max_element(begin, end));
+
+        if (*begin == *(end - 1))
         {
             return ++begin;
         }
-        std::iter_swap(min_max.first, begin);
-        std::iter_swap(min_max.second, end - 1);
+
         RanIter bound = std::partition(begin + 1, end - 1, [&](const point_2 &a)
         {
-            return orientation(min_point, max_point, a) == CG_RIGHT;
+            return orientation(*begin, *(end - 1), a) == CG_RIGHT;
         });
 
         std::iter_swap(end - 1, bound);
-        RanIter first = build_part(begin, bound, max_point);
-        RanIter second = build_part(bound, end, min_point);
+        RanIter first = build_part(begin, bound, *bound);
+        RanIter second = build_part(bound, end, *begin);
         return swap_ranges(bound, second, first);
     }
 }
