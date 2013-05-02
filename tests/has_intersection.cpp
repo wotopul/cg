@@ -67,6 +67,14 @@ TEST(segment_intersection, line3) {
 
     EXPECT_EQ(has_intersection(s1, s2), false);
 }
+
+TEST(segment_intersection, singular) {
+    point_2 a1(0, 0), a2(0, 0), a3(-1, -1), a4(1, -1);
+
+    segment_2 s1(a1, a2), s2(a3, a4);
+
+    EXPECT_EQ(has_intersection(s1, s2), false);
+}
 // -- END segment_intersection --
 
 // ---- START segment in triangle --
@@ -162,5 +170,25 @@ TEST(rect_test, t5)
     segment_2 s(p1, p2);
 
     EXPECT_EQ(has_intersection(rect, s), true);
+}
+
+TEST(rect_test, singular_rect)
+{
+    range_d r1(0, 0), r2(0, 1);
+    rectangle_2 rect(r1, r2);
+    point_2 p1(-1, -1), p2(2, -1);
+    segment_2 s(p1, p2);
+
+    EXPECT_EQ(has_intersection(rect, s), false);
+}
+
+TEST(rect_test, singular_segm)
+{
+    range_d r1(0, 1), r2(0, 1);
+    rectangle_2 rect(r1, r2);
+    point_2 p1(-1, -1), p2(-1, -1);
+    segment_2 s(p1, p2);
+
+    EXPECT_EQ(has_intersection(rect, s), false);
 }
 // -- END rectangle --
