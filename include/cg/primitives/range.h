@@ -12,6 +12,7 @@ namespace cg
    typedef range_t<float> range_f;
    typedef range_t<int> range_i;
    typedef range_t<double> range_d;
+   typedef range_t<double> range;
 
    template <class Scalar>
    struct range_t
