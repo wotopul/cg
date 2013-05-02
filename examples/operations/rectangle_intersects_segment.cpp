@@ -21,7 +21,7 @@ struct rectangle_intersects_segment_viewer : cg::visualization::viewer_adapter
    rectangle_intersects_segment_viewer()
       : s_(point_2(-100, -100), point_2(100, 100)),
         r_(cg::range_d(-50, 50), cg::range_d(-50, 50)),
-	     rbutton_pressed_(false)
+        rbutton_pressed_(false)
    {}
 
    void draw(cg::visualization::drawer_type & drawer) const
@@ -35,14 +35,14 @@ struct rectangle_intersects_segment_viewer : cg::visualization::viewer_adapter
          drawer.draw_line(r_.corner(l, l), r_.corner(l^1, l));
          drawer.draw_line(r_.corner(l, l), r_.corner(l, l^1));
       }
-	  
-	   if (idx_) {
+
+      if (idx_) {
          drawer.set_color(rbutton_pressed_ ? Qt::red : Qt::yellow);
          if(on_rect)
             drawer.draw_point(r_.corner((*idx_).first, (*idx_).second), 5);
          else
             drawer.draw_point(s_[(*idx_).first], 5);
-	   }
+      }
    }
 
    void print(cg::visualization::printer_type & p) const
@@ -55,13 +55,15 @@ struct rectangle_intersects_segment_viewer : cg::visualization::viewer_adapter
 
    bool on_press(const point_2f & p)
    {
-	   rbutton_pressed_ = true;
+      rbutton_pressed_ = true;
       return set_idx(p);
    }
 
    bool on_release(const point_2f & p)
    {
       rbutton_pressed_ = false;
+      r_.x = {std::min(r_.x.inf, r_.x.sup), std::max(r_.x.inf, r_.x.sup)};
+      r_.y = {std::min(r_.y.inf, r_.y.sup), std::max(r_.y.inf, r_.y.sup)};
       return false;
    }
 
@@ -113,7 +115,7 @@ private:
 
       return idx_;
    }
-	
+
    cg::segment_2 s_;
    bool on_rect;
    cg::rectangle_2 r_;
