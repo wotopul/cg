@@ -35,6 +35,14 @@ TEST(has_intersection, segment_segment)
    s1 = { {0, 0}, {0, 0} };
    s2 = { {-1, -1}, {1, -1} };
    EXPECT_FALSE(cg::has_intersection(s1, s2));
+
+   s1 = { {0, 0}, {0, 0} };
+   s2 = { {0, 0}, {0, 0} };
+   EXPECT_TRUE(cg::has_intersection(s1, s2));
+
+   s1 = { {0, 0}, {0, 0} };
+   s2 = { {1, 0}, {1, 0} };
+   EXPECT_FALSE(cg::has_intersection(s1, s2));
 }
 
 TEST(has_intersection, triangle_segment)
