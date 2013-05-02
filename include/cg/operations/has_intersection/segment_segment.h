@@ -11,8 +11,6 @@ namespace cg
    {
       if (a[0] == a[1])
          return contains(b, a[0]);
-      if (b[0] == b[1])
-         return contains(a, b[0]);
 
       orientation_t ab[2];
       for (size_t l = 0; l != 2; ++l)
