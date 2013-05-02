@@ -92,7 +92,7 @@ namespace cg
     }
 
     template <class RanIter>
-    RanIter build_part(RanIter begin, RanIter end, typename std::iterator_traits<RanIter>::value_type &last_point)
+    RanIter build_part(RanIter begin, RanIter end, point_2 const &last_point)
     {
         if (begin + 1 == end)
         {
@@ -112,12 +112,12 @@ namespace cg
         }
         std::iter_swap(begin + 1, highest_point_iter);
 
-        RanIter first = std::partition(begin + 2, end, [begin, &highest_point](const point_2 &point)
+        RanIter first = std::partition(begin + 2, end, [begin, &highest_point](point_2 const &point)
         {
             return orientation(*begin, highest_point, point) == CG_RIGHT;
         });
 
-        RanIter second = std::partition(first, end, [&highest_point, &last_point](const point_2 &point)
+        RanIter second = std::partition(first, end, [&highest_point, &last_point](point_2 const &point)
         {
             return orientation(highest_point, last_point, point) == CG_RIGHT;
         });
@@ -145,7 +145,7 @@ namespace cg
             return ++begin;
         }
 
-        RanIter bound = std::partition(begin + 1, end - 1, [&](const point_2 &a)
+        RanIter bound = std::partition(begin + 1, end - 1, [begin, end](point_2 const &a)
         {
             return orientation(*begin, *(end - 1), a) == CG_RIGHT;
         });
