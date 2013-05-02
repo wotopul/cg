@@ -41,24 +41,27 @@ struct : boost::static_visitor<>
    void operator() ( segment_2& )
    {}
 
-   void operator() ( point_2& p ) {
-      point_2 rational_res = detail::intersection_r ( {points[l], points[lp]}, {points[k], points[kp]} );
-      auto bound = pow ( 2.0, EPS_PWR + 1 );
+   void operator() ( point_2& p )
+   {
+      point_2 rational_res = detail::intersection_r ( {(*points)[l], (*points)[lp]}, {(*points)[k], (*points)[kp]} );
+      auto bound = pow ( 2.0, EPS_PWR );
       ASSERT_TRUE ( fabs(rational_res.x - p.x) <= bound && fabs(rational_res.y - p.y) <= bound );
    }
-   
-   std::vector<point_2> points;
+
+   std::vector<point_2> * points = nullptr;
    int l, k, lp, kp;
 } visitor;
 
 TEST ( intersection, random )
 {
-   auto points = uniform_points ( 100 );
+   auto points = uniform_points ( 1000 );
 
-   visitor.points = points;
+   visitor.points = &points;
 
-   for ( int l = 0, lp = points.size() - 1; l != points.size(); lp = l++ ) {
-      for ( int k = 0, kp = points.size() - 1; k != points.size(); kp = k++ ) {
+   for ( size_t l = 0, lp = points.size() - 1; l != points.size(); lp = l++ )
+   {
+      for ( size_t k = 0, kp = points.size() - 1; k != points.size(); kp = k++ )
+      {
          auto res = intersection ( {points[l], points[lp]}, {points[k], points[kp]}, EPS_PWR );
          visitor.l = l;
          visitor.k = k;

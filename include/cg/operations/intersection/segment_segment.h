@@ -19,10 +19,10 @@ namespace cg
       bool same_hotpixel ( double a, double b, double bound )
       {
          double ar = a / bound, br = b / bound;
-         
+
          if (isinf(ar) || isinf(br) || isnan(ar) || isnan(br))
             return false;
-         
+
          double hp1 = floor ( ar );
          double hp2 = floor ( br );
 
@@ -53,17 +53,17 @@ namespace cg
          double det_sup = ( a[0].x + a[1].x ) * ( b[0].y + b[1].y ) + ( a[0].y + a[1].y ) * ( b[0].x + b[1].x );
          int det_ind = 4;
          double t1_sup = a[0].x * a[1].y + a[0].y * a[1].x;
-         int t1_ind = 2;
+//         int t1_ind = 2;
          double t2_sup = b[0].x * b[1].y + b[0].y * b[1].x;
-         int t2_ind = 2;
+//         int t2_ind = 2;
 
          double xt = t1 * ( b[0].x - b[1].x ) - ( a[0].x - a[1].x ) * t2;
          double yt = t1 * ( b[0].y - b[1].y ) - ( a[0].y - a[1].y ) * t2;
 
          double xt_sup = t1_sup * ( b[0].x + b[1].x ) + ( a[0].x + a[1].x ) * t2_sup;
-         int xt_ind = 4;
+//         int xt_ind = 4;
          double yt_sup = t1_sup * ( b[0].y + b[1].y ) + ( a[0].y + a[1].y ) * t2_sup;
-         int yt_ind = 4;
+//         int yt_ind = 4;
 
          double x = ( xt ) / det;
          double y = ( yt ) / det;
@@ -77,7 +77,7 @@ namespace cg
          double y_eps = y_sup * y_ind * 2 * std::numeric_limits<double>::epsilon();
 
          double bound = pow ( 2.0, eps_pwr );
-         
+
          //std::cout << "int_d: (" << x << ", " << y << ")" << std::endl;
 
          if ( same_hotpixel ( x - x_eps, x + x_eps, bound ) && same_hotpixel ( y - y_eps, y + y_eps, bound ) )
@@ -101,7 +101,7 @@ namespace cg
 
          /*std::cout << "int_i: x=[" << res.x.lower() << ", " << res.x.upper() << "]\n";
          std::cout << "int_i: y=[" << res.y.lower() << ", " << res.y.upper() << "]" << std::endl;*/
-         
+
          if ( same_hotpixel ( res.x.lower(), res.x.upper(), bound )
                && same_hotpixel ( res.y.lower(), res.y.upper(), bound ) )
             return point_2 ( res.x.lower(), res.y.lower() );
@@ -157,7 +157,7 @@ namespace cg
       if (res) {
          return *res;
       }
-      
+
       return boost::none;
 
       return detail::intersection_r ( a, b );
