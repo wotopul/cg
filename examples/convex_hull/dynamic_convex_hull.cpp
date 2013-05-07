@@ -19,7 +19,8 @@ template <class Algo>
 struct dynamic_hull_viewer : cg::visualization::viewer_adapter
 {
    dynamic_hull_viewer()
-      : mode(inserting), ch_size(0), all_pts(0)
+      : mode(inserting), ch_size(0), all_pts(0),
+        all_pts_pair(dh.get_hull()), hull_pair(dh.get_all_points())
    {}
 
    void draw(cg::visualization::drawer_type& drawer) const
@@ -112,7 +113,6 @@ struct dynamic_hull_viewer : cg::visualization::viewer_adapter
    bool on_move(const point_2f& p)
    {
       set_cur_it(p);
-      current_p = &p;
       return true;
    }
 
@@ -158,7 +158,6 @@ private:
    Algo dh;
 
    boost::optional<vect_it> cur_it;
-   const point_2f * current_p;
    size_t ch_size, all_pts;
    std::pair<vect_it, vect_it> hull_pair, all_pts_pair;
 };
