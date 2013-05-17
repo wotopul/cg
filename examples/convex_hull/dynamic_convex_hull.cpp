@@ -5,22 +5,22 @@
 
 #include <cg/visualization/viewer_adapter.h>
 #include <cg/visualization/draw_util.h>
-#include <cg/convex_hull/naive_dynamic.h>
 
 #include <cg/io/point.h>
 
 #include <cg/primitives/point.h>
-#include <cg/convex_hull/graham.h>
+#include <cg/convex_hull/naive_dynamic.h>
 
 using cg::point_2f;
 using cg::point_2;
+using cg::vect_it;
 
 template <class Algo>
 struct dynamic_hull_viewer : cg::visualization::viewer_adapter
 {
    dynamic_hull_viewer()
       : mode(inserting), ch_size(0), all_pts(0),
-        all_pts_pair(dh.get_hull()), hull_pair(dh.get_all_points())
+        hull_pair(dh.get_all_points()), all_pts_pair(dh.get_hull())
    {}
 
    void draw(cg::visualization::drawer_type& drawer) const

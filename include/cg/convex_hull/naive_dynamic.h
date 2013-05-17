@@ -1,9 +1,11 @@
 #pragma once
-#include <cg/convex_hull/dynamic_hull_interface.h>
-#include "graham.h"
-typedef std::vector<point_2>::iterator vect_it;
+
+#include <cg/primitives/point.h>
+#include <cg/convex_hull/graham.h>
+
 namespace cg
 {
+   typedef std::vector<point_2>::iterator vect_it;
 
    struct naive_dynamic_hull
    {

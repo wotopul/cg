@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
 #include <boost/assign/list_of.hpp>
-#include <cg/convex_hull/naive_dynamic.h>
-#include <cg/primitives/point.h>
-#include <iostream>
 
+#include <cg/convex_hull/naive_dynamic.h>
 
 #include "random_utils.h"
 
@@ -46,7 +44,7 @@ TEST(dynamic_convex_hull, without_deleting1)
                               (point_2(3, 0));
    cg::naive_dynamic_hull dh;
 
-for (point_2 p : pts)
+   for (point_2 p : pts)
    {
       dh.add_point(p);
    }
@@ -67,13 +65,12 @@ TEST(dynamic_convex_hull, without_deleting2)
 
    cg::naive_dynamic_hull dh;
 
-	for (point_2 p : pts)
+   for (point_2 p : pts)
    {
       dh.add_point(p);
    }
 
    EXPECT_TRUE(is_convex_hull(pts.begin(), pts.end(), dh.get_hull().first, dh.get_hull().second));
-
 }
 
 TEST(dynamic_convex_hull, unifrom_without_deleting)
@@ -83,13 +80,12 @@ TEST(dynamic_convex_hull, unifrom_without_deleting)
    std::vector<point_2> pts = uniform_points(100000);
    cg::naive_dynamic_hull dh;
 
-	for (point_2 p : pts)
+   for (point_2 p : pts)
    {
       dh.add_point(p);
    }
 
    EXPECT_TRUE(is_convex_hull(pts.begin(), pts.end(), dh.get_hull().first, dh.get_hull().second));
-
 }
 
 TEST(dynamic_convex_hull, with_deleting)
@@ -112,7 +108,7 @@ TEST(dynamic_convex_hull, with_deleting)
                                       (point_2(0, 1));
    cg::naive_dynamic_hull dh;
 
-	for (point_2 p : pts)
+   for (point_2 p : pts)
    {
       dh.add_point(p);
    }
@@ -121,8 +117,6 @@ TEST(dynamic_convex_hull, with_deleting)
    dh.remove_point(point_2(-1, 2));
    dh.remove_point(point_2(2, 4));
    EXPECT_TRUE(is_convex_hull(not_removed.begin(), not_removed.end(), dh.get_hull().first, dh.get_hull().second));
-
-
 }
 
 TEST(dynamic_convex_hull, unifrom_with_deleting)
@@ -133,7 +127,7 @@ TEST(dynamic_convex_hull, unifrom_with_deleting)
    cg::naive_dynamic_hull dh;
    std::set<point_2> added;
 
-	for (point_2 p : pts)
+   for (point_2 p : pts)
    {
       if (rand() % 2 || added.empty())
       {
@@ -150,7 +144,4 @@ TEST(dynamic_convex_hull, unifrom_with_deleting)
    }
 
    EXPECT_TRUE(is_convex_hull(after_deleting.begin(), after_deleting.end(), dh.get_hull().first, dh.get_hull().second));
-
 }
-
-

@@ -31,14 +31,13 @@ namespace cg
       std::iter_swap(p, min_elem);
       auto last = p;
       while (last != q - 1) {
-         auto next_p = std::min_element(last + 1, q, [last] (point_2 const & a, point_2 const & b)
+         auto next_p = std::min_element(last + 1, q, [last] (typename std::iterator_traits< RandIter >::value_type const & a,
+                                                             typename std::iterator_traits< RandIter >::value_type const & b)
                                            { 
                                              orientation_t orient = orientation(*last, a, b);
                                              if (orient == CG_RIGHT) return false;
                                              if (orient == CG_LEFT) return true;
-                                             if (*last <= a && a <= b) return true;
-                                             if (b <= a && a <= *last) return true;
-                                             return false;
+                                             return collinear_are_ordered_along_line(*last, a, b);
                                           });
          if (orientation(*last, *next_p, *p) == CG_RIGHT)
             break;

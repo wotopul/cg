@@ -21,7 +21,7 @@ TEST(orientation, uniform_line)
       cg::point_2 a = pts[l];
       cg::point_2 b = pts[ln];
 
-      for (size_t k = 0; k != 1000; ++k)
+      for (size_t k = 0; k != 300; ++k)
       {
          double t = distr();
          cg::point_2 c = a + t * (b - a);
