@@ -128,8 +128,8 @@ namespace cg
       return orientation(point, prev, next) == CG_RIGHT;
    }
 
-
-   inline bool collinear_are_ordered_along_line(point_2 const & a, point_2 const & b, point_2 const & c)
+   template <class Scalar>
+   bool collinear_are_ordered_along_line(point_2t<Scalar> const & a, point_2t<Scalar> const & b, point_2t<Scalar> const & c)
    {
       return (a <= b && b <= c) || (c <= b && b <= a);
    }
