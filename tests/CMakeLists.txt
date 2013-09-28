@@ -21,6 +21,7 @@ set(SOURCES
    intersection.cpp
    convex.cpp
    simplify.cpp
+   diameter.cpp
 )
 
 add_executable(cg-test ${SOURCES})

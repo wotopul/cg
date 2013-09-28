@@ -4,7 +4,8 @@
 #include <cmath>
 
 namespace cg {
-   inline double distance(point_2 const& a, point_2 const& b)
+   template<class S>
+   inline double distance(point_2t<S> const& a, point_2t<S> const& b)
    {
       auto v = b - a;
       return sqrt(v * v);
@@ -16,7 +17,8 @@ namespace cg {
       return (v * (p - s[0])) / (v * v);
    }
 
-   inline double length(segment_2 const& s)
+   template<class S>
+   inline double length(segment_2t<S> const& s)
    {
       return distance(s[0], s[1]);
    }
