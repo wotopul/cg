@@ -15,6 +15,21 @@
 using cg::point_2;
 using cg::point_2f;
 
+namespace  {
+   void draw_vector(std::vector<point_2> const& p, cg::visualization::drawer_type & drawer)
+   {
+      if (p.empty())
+         return;
+
+      auto b = p.begin();
+      auto a = b++;
+      while (b != p.end())
+      {
+         drawer.draw_line(*a++, *b++);
+      }
+   }
+}
+
 struct simplify_viewer : cg::visualization::viewer_adapter
 {
    simplify_viewer()
@@ -30,7 +45,8 @@ struct simplify_viewer : cg::visualization::viewer_adapter
 
    void print(cg::visualization::printer_type & p) const
    {
-      p.corner_stream() << "Simplifying polyline";
+      p.corner_stream() << "Simplifying polyline."
+                        << "Double click to clear, right-click to add point.";
    }
 
    bool on_press(const point_2f & p)
@@ -59,18 +75,6 @@ struct simplify_viewer : cg::visualization::viewer_adapter
    }
 
 private:
-   void draw_vector(std::vector<point_2> const& p, cg::visualization::drawer_type & drawer) const
-   {
-      if (p.empty())
-         return;
-
-      auto b = p.begin();
-      auto a = b++;
-      while (b != p.end())
-      {
-         drawer.draw_line(*a++, *b++);
-      }
-   }
 
    std::vector<point_2> points;
    std::vector<point_2> simplified;
