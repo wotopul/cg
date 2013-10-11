@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
+#include <boost/array.hpp>
 
 #include "point.h"
 
@@ -23,7 +24,7 @@ namespace cg
       point_2t<Scalar> const &   operator [] (size_t id) const { return pts_[id]; }
 
    private:
-      boost::array<point_2t<Scalar>, 2 > pts_;
+      boost::array< point_2t<Scalar>, 2 > pts_;
    };
 
    template <class Scalar>
