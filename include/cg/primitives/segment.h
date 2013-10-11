@@ -28,19 +28,25 @@ namespace cg
    };
 
    template <class Scalar>
-   point_2t<Scalar> const & min(segment_2t<Scalar> const & seg) { return std::min(seg[0], seg[1]); }
+   point_2t<Scalar> const& min(segment_2t<Scalar> const& seg)
+   {
+      return std::min(seg[0], seg[1]);
+   }
 
    template <class Scalar>
-   point_2t<Scalar> const & max(segment_2t<Scalar> const & seg) { return std::max(seg[0], seg[1]); }
+   point_2t<Scalar> const& max(segment_2t<Scalar> const& seg)
+   {
+      return std::max(seg[0], seg[1]);
+   }
 
    template <class Scalar>
-   bool operator == (segment_2t<Scalar> const & a, segment_2t<Scalar> const & b)
+   bool operator == (segment_2t<Scalar> const& a, segment_2t<Scalar> const& b)
    {
       return (a[0] == b[0]) && (a[1] == b[1]);
    }
 
    template <class Scalar>
-   bool operator != (segment_2t<Scalar> const & a, segment_2t<Scalar> const & b)
+   bool operator != (segment_2t<Scalar> const& a, segment_2t<Scalar> const& b)
    {
       return !(a == b);
    }
