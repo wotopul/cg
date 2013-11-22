@@ -2,6 +2,7 @@
 
 #include <cg/primitives/point.h>
 #include <cg/primitives/segment.h>
+#include <cg/operations/distance.h>
 
 #include <boost/array.hpp>
 
@@ -23,6 +24,21 @@ namespace cg
       point_2t<Scalar> const &   operator [] (size_t id) const { return pts_[id]; }
 
       segment_2t<Scalar> side(size_t id) const { return segment_2t<Scalar>(pts_[(id + 1) % 3], pts_[(id + 2) % 3]); }
+
+      // center and radius of circumscribed circle
+      point_2t<Scalar> center()
+      {
+          // TODO: do it ok
+          point_2t<Scalar> a = pts_[0], b = pts_[1], c = pts_[2];
+          Scalar ma = a.x * a.x + a.y * a.y;
+          Scalar mb = b.x * b.x + b.y * b.y;
+          Scalar mc = c.x * c.x + c.y * c.y;
+          Scalar d = 2 * ( a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y) );
+          Scalar o_x = (ma * (b.y - c.y) + mb * (c.y - a.y) + mc * (a.y - b.y)) / d;
+          Scalar o_y = (ma * (c.x - b.x) + mb * (a.x - c.x) + mc * (b.x - a.x)) / d;
+          return point_2t<Scalar>(o_x, o_y);
+      }
+      Scalar radius() { return cg::distance(center(), pts_[0]); }
 
    private:
       boost::array<point_2t<Scalar>, 3 > pts_;
