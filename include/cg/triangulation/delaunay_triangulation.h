@@ -8,6 +8,7 @@
 #include <cg/operations/orientation.h>
 #include <cg/primitives/point.h>
 #include <cg/primitives/triangle.h>
+#include <cg/io/point.h>
 
 namespace cg
 {
@@ -33,7 +34,7 @@ struct vertex
     edge_p<Scalar> out;
 
     vertex() {}
-    vertex(point_2t<Scalar> p) : p(p), inf(false) {}
+    vertex(point_2t<Scalar> p) : inf(false), p(p)  {}
 };
 
 template <class Scalar>
@@ -42,14 +43,22 @@ struct edge
     vertex_p<Scalar> begin;
     edge_p<Scalar>   next;
     edge_p<Scalar>   twin;
+    face_p<Scalar>   in_face;
 
     edge() {}
     edge(vertex_p<Scalar> begin)
         : begin(begin)
     {}
 
-    vertex_p<Scalar> end() { return next->begin; }
+    vertex_p<Scalar> end() const { return next->begin; }
 };
+
+template <class Scalar>
+void make_twins(edge_p<Scalar> e1, edge_p<Scalar> e2)
+{
+    e1->twin = e2;
+    e2->twin = e1;
+}
 
 template <class Scalar>
 struct face
@@ -60,13 +69,20 @@ struct face
 
     face(vertex_p<Scalar> a, vertex_p<Scalar> b, vertex_p<Scalar> c)
     {
-        side = new edge<Scalar>(a);
-        side->next = new edge<Scalar>(b);
-        side->next->next = new edge<Scalar>(c);
-        side->next->next->next = side;
+        edge_p<Scalar> edges[3] = {edge_p<Scalar>(new edge<Scalar>(a)),
+                                   edge_p<Scalar>(new edge<Scalar>(b)),
+                                   edge_p<Scalar>(new edge<Scalar>(c))};
+        for (int i = 0; i < 3; i++)
+        {
+            edges[i]->in_face = face_p<Scalar>(this);
+        }
+        side           = edges[0];
+        edges[0]->next = edges[1];
+        edges[1]->next = edges[2];
+        edges[2]->next = side;
     }
 
-    cg::triangle_2t<Scalar> to_triangle()
+    cg::triangle_2t<Scalar> to_triangle() const
     {
         cg::triangle_2t<Scalar> res;
         auto curr = side;
@@ -78,7 +94,7 @@ struct face
         return res;
     }
 
-    bool contains_inf()
+    bool contains_inf() const
     {
         auto curr = side; // a bit of copy-paste here
         for (int i = 0; i < 3; i++)
@@ -90,7 +106,7 @@ struct face
         return false;
     }
 
-    bool contains(point_2t<Scalar> p)
+    bool contains(point_2t<Scalar> p) const
     {
         auto curr = side;
         for (int i = 0; i < 3; i++)
@@ -108,29 +124,29 @@ struct face
 
 // logging
 template <class Scalar>
-std::ostream& operator<<(std::ostream& out, vertex_p<Scalar> v)
+std::ostream & operator<<(std::ostream & out, const vertex_p<Scalar> v)
 {
     if (v->inf)
         out << "inf" << std::endl;
     else
-        out << "(" << v->p.x << ", " << v->p.y << ")" << std::endl;
+        out << "(" << v->p.x << ", " << v->p.y << ")";
     return out;
 }
 
 template <class Scalar>
-std::ostream& operator<<(std::ostream& out, edge_p<Scalar> e)
+std::ostream & operator<<(std::ostream & out, const edge_p<Scalar> e)
 {
-    out << "[ " << e->begin << ", " << e->end() << " ]" << std::endl;
+    out << "[ " << e->begin << ", " << e->end() << " ]";
     return out;
 }
 
 template <class Scalar>
-std::ostream& operator<<(std::ostream& out, face_p<Scalar> f)
+std::ostream & operator<<(std::ostream & out, const face_p<Scalar> f)
 {
     out << "face: " << std::endl;
     out << f->side             << std::endl;
     out << f->side->next       << std::endl;
-    out << f->side->next->next << std::endl;
+    out << f->side->next->next;
     return out;
 }
 
@@ -164,29 +180,31 @@ public:
 template <class Scalar>
 void delaunay_triangulation<Scalar>::init_triangulation()
 {
-    faces.push_back( new face<Scalar>(vertices[0], vertices[1], vertices[2]) );
-    faces.push_back( new face<Scalar>(vertices[1], vertices[0], vertices[2]) );
+    faces.push_back( face_p<Scalar>(new face<Scalar>(vertices[0], vertices[1], vertices[2])) );
+    faces.push_back( face_p<Scalar>(new face<Scalar>(vertices[1], vertices[0], vertices[2])) );
     auto e1 = faces[0]->side, e2 = faces[1]->side;
-    for (int i = 0; i < 3; i++)
-    {
-        e1->twin = e2;
-        e2->twin = e1;
-        e1 = e1->next;
-        e2 = e2->next;
-    }
+    make_twins(e1, e2);
+    make_twins(e1->next, e2->next->next);
+    make_twins(e2->next, e1->next->next);
+    std::cerr << faces[0] << std::endl << faces[1] << std::endl;
 }
 
 template <class Scalar>
 void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 {
+    std::cerr << "adding point: " << p << std::endl;
     vertex_p<Scalar> v(new vertex<Scalar>(p));
     vertices.push_back(v);
     if (vertices.size() < 3)
         return;
     if (vertices.size() == 3)
+    {
         init_triangulation();
+        return;
+    }
 
     // locate
+
     // add new edges in face
     // for every bad edge in old face recursively fix them
 }

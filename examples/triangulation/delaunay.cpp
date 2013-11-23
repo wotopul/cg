@@ -1,6 +1,7 @@
 #include <QColor>
 #include <QApplication>
 
+#include <vector>
 #include <algorithm>
 #include <boost/optional.hpp>
 
@@ -39,16 +40,15 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
    bool on_release(const point_2f & p)
    {
       pts.push_back(p);
-      // triangulation.add(p);
-      //return pts.size() > 2;
+      triangulation.add(p);
       answer.clear();
-      triangulation.triangulate(std::back_inserter< std::vector<cg::triangle_2> >(answer));
+      triangulation.triangulate(std::back_inserter(answer));
       return true;
    }
 
    bool on_double_click(const point_2f & p)
    {
-       pts.clear();
+       // pts.clear();
        // triangulation.clear();
        return true;
    }
