@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
@@ -103,6 +104,36 @@ struct face
         return true;
     }
 };
+
+
+// logging
+template <class Scalar>
+std::ostream& operator<<(std::ostream& out, vertex_p<Scalar> v)
+{
+    if (v->inf)
+        out << "inf" << std::endl;
+    else
+        out << "(" << v->p.x << ", " << v->p.y << ")" << std::endl;
+    return out;
+}
+
+template <class Scalar>
+std::ostream& operator<<(std::ostream& out, edge_p<Scalar> e)
+{
+    out << "[ " << e->begin << ", " << e->end() << " ]" << std::endl;
+    return out;
+}
+
+template <class Scalar>
+std::ostream& operator<<(std::ostream& out, face_p<Scalar> f)
+{
+    out << "face: " << std::endl;
+    out << f->side             << std::endl;
+    out << f->side->next       << std::endl;
+    out << f->side->next->next << std::endl;
+    return out;
+}
+
 
 template <class Scalar>
 class delaunay_triangulation
