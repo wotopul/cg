@@ -121,6 +121,18 @@ struct face
     }
 };
 
+template <class Scalar>
+struct contains_pred
+{
+    point_2t<Scalar> p;
+
+    contains_pred(point_2t<Scalar> p) : p(p) {}
+    bool operator()(const face_p<Scalar> f)
+    {
+        return f->contains(p);
+    }
+};
+
 
 // logging
 template <class Scalar>
@@ -143,10 +155,8 @@ std::ostream & operator<<(std::ostream & out, const edge_p<Scalar> e)
 template <class Scalar>
 std::ostream & operator<<(std::ostream & out, const face_p<Scalar> f)
 {
-    out << "face: " << std::endl;
-    out << f->side             << std::endl;
-    out << f->side->next       << std::endl;
-    out << f->side->next->next;
+    out << "{face: "     << " " << f->side << " "
+        << f->side->next << " " << f->side->next->next << "}";
     return out;
 }
 
@@ -186,13 +196,13 @@ void delaunay_triangulation<Scalar>::init_triangulation()
     make_twins(e1, e2);
     make_twins(e1->next, e2->next->next);
     make_twins(e2->next, e1->next->next);
-    std::cerr << faces[0] << std::endl << faces[1] << std::endl;
+    std::cout << faces[0] << std::endl << faces[1] << std::endl;
 }
 
 template <class Scalar>
 void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 {
-    std::cerr << "adding point: " << p << std::endl;
+    std::cout << "adding point: " << p << std::endl;
     vertex_p<Scalar> v(new vertex<Scalar>(p));
     vertices.push_back(v);
     if (vertices.size() < 3)
@@ -203,7 +213,17 @@ void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
         return;
     }
 
-    // locate
+    // localization -- O(faces.size()) here :-(
+    std::vector< face_p<Scalar> > containing; // faces that contains added point
+    std::for_each(faces.begin(), faces.end(),
+        [&containing, &p](face_p<Scalar> f)
+            {
+                if (f->contains(p))
+                {
+                    std::cout << f << " contains " << p << std::endl;
+                    containing.push_back(f);
+                }
+            });
 
     // add new edges in face
     // for every bad edge in old face recursively fix them
