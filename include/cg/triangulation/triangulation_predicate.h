@@ -95,13 +95,10 @@ namespace cg // TODO delete copy-paste
          {
             return true;
          }
-
-         if (cres < 0)
+         else
          {
             return false;
          }
-
-         return false; // on border
       }
    };
 
