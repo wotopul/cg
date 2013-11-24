@@ -196,6 +196,8 @@ class delaunay_triangulation
    void flip_if(edge_p<Scalar> e);
    bool non_delaunay(edge_p<Scalar> e);
 
+   void reset();
+
 public:
 
    delaunay_triangulation()
@@ -204,10 +206,14 @@ public:
       vertices.push_back( boost::make_shared< vertex<Scalar> >() );
    }
 
+   ~delaunay_triangulation();
+
    void clear()
    {
+      reset();
       faces.clear();
-      vertices.resize(1); // keep inf point
+      vertices.clear();
+      vertices.push_back( boost::make_shared< vertex<Scalar> >() );
    }
 
    void add(point_2t<Scalar> p);
@@ -227,6 +233,25 @@ public:
 };
 
 template <class Scalar>
+void delaunay_triangulation<Scalar>::reset()
+{
+   for (auto f = faces.begin(); f != faces.end(); f++)
+   {
+      (*f)->side->next.reset();
+      (*f)->side->twin.reset();
+      (*f)->side->begin.reset();
+      (*f)->side->in_face.reset();
+      (*f)->side.reset();
+   }
+}
+
+template <class Scalar>
+delaunay_triangulation<Scalar>::~delaunay_triangulation()
+{
+   reset();
+}
+
+template <class Scalar>
 void delaunay_triangulation<Scalar>::init_triangulation()
 {
    faces.push_back( make_face(vertices[0], vertices[1], vertices[2]) );
@@ -240,7 +265,7 @@ void delaunay_triangulation<Scalar>::init_triangulation()
 template <class Scalar>
 bool delaunay_triangulation<Scalar>::non_delaunay(edge_p<Scalar> e)
 {
-   if (e->contains_inf() || e->twin->next->end()->inf) // TODO do this case
+   if (e->contains_inf() || e->twin->next->end()->inf)
       return false;
    return cg::in_circle(e->begin->p, e->next->begin->p, e->next->next->begin->p,
                         e->twin->next->end()->p);
@@ -318,7 +343,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
 {
    // build up chain
    std::vector< edge_p<Scalar> > chain;
-   if (faces[containing.front()]->contains_inf()) // fix it
+   if (faces[containing.front()]->contains_inf() && faces[containing.back()]->contains_inf())
    {
       //std::cout << "out of convex" << std::endl;
       edge_p<Scalar> curr = start;
@@ -343,7 +368,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
    }
    else
    {
-      //std::cout << "in convex on edge" << std::endl;
+      //std::cout << "on edge" << std::endl;
       edge_p<Scalar> common;
       auto e1 = faces[containing[0]]->side;
       for (int i = 0; i < 3; i++)
