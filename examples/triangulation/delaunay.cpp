@@ -32,8 +32,8 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
          {
             drawer.set_color(Qt::white);
             cg::visualization::draw(drawer, tr);
-            //drawer.set_color(Qt::green);
-            //cg::visualization::draw(drawer, tr.center(), tr.radius());
+            drawer.set_color(Qt::green);
+            cg::visualization::draw(drawer, tr.center(), tr.radius());
          });
    }
 

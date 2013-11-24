@@ -240,7 +240,7 @@ void delaunay_triangulation<Scalar>::init_triangulation()
 template <class Scalar>
 bool delaunay_triangulation<Scalar>::non_delaunay(edge_p<Scalar> e)
 {
-   if (e->contains_inf()) // TODO do this case
+   if (e->contains_inf() || e->twin->next->end()->inf) // TODO do this case
       return false;
    return cg::in_circle(e->begin->p, e->next->begin->p, e->next->next->begin->p,
                         e->twin->next->end()->p);
