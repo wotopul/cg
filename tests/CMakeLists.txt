@@ -13,6 +13,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARYDIR})
 
 set(SOURCES
+   delaunay.cpp
    orientation.cpp
    has_intersection.cpp
    contains.cpp

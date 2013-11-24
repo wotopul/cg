@@ -294,7 +294,6 @@ edge_p<Scalar> delaunay_triangulation<Scalar>::localize(point_2t<Scalar> p, std:
       if (!faces[i]->contains(p))
          continue;
 
-      std::cout << faces[i] << " contains " << p << std::endl;
       containing.push_back(i);
       edge_p<Scalar> curr = faces[i]->side;
       for (int j = 0; j < 3; j++)
@@ -321,7 +320,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
    std::vector< edge_p<Scalar> > chain;
    if (faces[containing.front()]->contains_inf()) // fix it
    {
-      std::cout << "out of convex" << std::endl;
+      //std::cout << "out of convex" << std::endl;
       edge_p<Scalar> curr = start;
       for (size_t i = 0; i < containing.size() - 1; i++)
       {
@@ -334,7 +333,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
    }
    else if (containing.size() == 1)
    {
-      std::cout << "in convex inside triangle" << std::endl;
+      //std::cout << "in convex inside triangle" << std::endl;
       edge_p<Scalar> curr = faces[containing.front()]->side;
       for (int i = 0; i < 3; i++)
       {
@@ -344,7 +343,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
    }
    else
    {
-      std::cout << "in convex on edge" << std::endl;
+      //std::cout << "in convex on edge" << std::endl;
       edge_p<Scalar> common;
       auto e1 = faces[containing[0]]->side;
       for (int i = 0; i < 3; i++)
@@ -363,11 +362,6 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
       chain.push_back(common->twin->next);
       chain.push_back(common->twin->next->next);
    }
-
-   std::cout << "chain: ";
-   for (auto i = chain.begin(); i != chain.end(); i++)
-      std::cout << *i << " ";
-   std::cout << std::endl;
 
    // remove faces
    size_t back = faces.size() - 1;
@@ -413,10 +407,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
 template <class Scalar>
 void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 {
-   std::cout << "-------------------" << std::endl;
-   std::cout << "adding point: " << p << std::endl;
    if (std::any_of(vertices.begin(), vertices.end(), [&p](vertex_p<Scalar> v){ return v->p == p; })) {
-      std::cout << "already in cell" << std::endl;
       return;
    }
 
@@ -435,10 +426,6 @@ void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
    edge_p<Scalar> start = localize(p, containing);
 
    split_up(containing, start, v);
-
-   for (auto i = faces.begin(); i != faces.end(); i++)
-      std::cout << *i << std::endl;
-   std::cout << std::endl;
 }
 
 
