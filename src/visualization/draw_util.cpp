@@ -27,6 +27,7 @@ namespace visualization
 
    void draw(drawer_type & drawer, cg::point_2 const & center, double radius)
    {
+      // guess this is enough for testing
       static const double PI = 3.14159265;
       cg::point_2 curr(center.x + radius, center.y);
       for (int angle = 0; angle <= 360; angle++)

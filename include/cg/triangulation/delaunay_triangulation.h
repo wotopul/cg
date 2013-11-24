@@ -33,7 +33,7 @@ struct vertex
     point_2t<Scalar> p;
     edge_p<Scalar> out;
 
-    vertex() {}
+    vertex() : inf(true) {} // construct inf point
     vertex(point_2t<Scalar> p) : inf(false), p(p)  {}
 };
 
@@ -171,7 +171,12 @@ class delaunay_triangulation
 
 public:
 
-    delaunay_triangulation() {}
+    delaunay_triangulation()
+    {
+        // add inf point
+        vertices.push_back( vertex_p<Scalar>(new vertex<Scalar>()) );
+    }
+
     void add(point_2t<Scalar> p);
 
     template <class OutIter>
