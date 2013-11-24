@@ -203,6 +203,11 @@ template <class Scalar>
 void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 {
     std::cout << "adding point: " << p << std::endl;
+    if (std::any_of(vertices.begin(), vertices.end(), [&p](vertex_p<Scalar> v){ return v->p == p; })) {
+        std::cout << "already in cell" << std::endl;
+        return;
+    }
+
     vertex_p<Scalar> v(new vertex<Scalar>(p));
     vertices.push_back(v);
     if (vertices.size() < 3)
@@ -213,7 +218,7 @@ void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
         return;
     }
 
-    // localization -- O(faces.size()) here :-(
+    // localization -- O(in faces.size()) here :-(
     std::vector< face_p<Scalar> > containing; // faces that contains added point
     std::for_each(faces.begin(), faces.end(),
         [&containing, &p](face_p<Scalar> f)

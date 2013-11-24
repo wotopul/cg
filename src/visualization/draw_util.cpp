@@ -29,7 +29,7 @@ namespace visualization
    {
       static const double PI = 3.14159265;
       cg::point_2 curr(center.x + radius, center.y);
-      for (int angle = 0; angle < 360; angle++)
+      for (int angle = 0; angle <= 360; angle++)
       {
          double alpha = angle * PI / 180;
          cg::point_2 next(center.x + radius * cos(alpha), center.y + radius * sin(alpha));
