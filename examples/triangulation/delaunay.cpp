@@ -21,20 +21,20 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
 
    void print(cg::visualization::printer_type & p) const
    {
-       p.corner_stream() << "right click: add point" << cg::visualization::endl;
-       p.corner_stream() << "double click: clear" << cg::visualization::endl;
+      p.corner_stream() << "right click: add point" << cg::visualization::endl;
+      p.corner_stream() << "double click: clear" << cg::visualization::endl;
    }
 
    void draw(cg::visualization::drawer_type & drawer) const
    {
-       std::for_each(answer.begin(), answer.end(),
-           [&](cg::triangle_2 tr)
-           {
-               drawer.set_color(Qt::white);
-               cg::visualization::draw(drawer, tr);
-               drawer.set_color(Qt::green);
-               cg::visualization::draw(drawer, tr.center(), tr.radius());
-           });
+      std::for_each(answer.begin(), answer.end(),
+         [&](cg::triangle_2 tr)
+         {
+            drawer.set_color(Qt::white);
+            cg::visualization::draw(drawer, tr);
+            drawer.set_color(Qt::green);
+            cg::visualization::draw(drawer, tr.center(), tr.radius());
+         });
    }
 
    bool on_release(const point_2f & p)
@@ -48,9 +48,9 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
 
    bool on_double_click(const point_2f & p)
    {
-       // pts.clear();
-       // triangulation.clear();
-       return true;
+      pts.clear();
+      triangulation.clear();
+      return true;
    }
 
 private:
