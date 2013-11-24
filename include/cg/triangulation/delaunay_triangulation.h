@@ -8,6 +8,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/weak_ptr.hpp>
 
+#include <cg/triangulation/triangulation_predicate.h>
 #include <cg/operations/orientation.h>
 #include <cg/primitives/point.h>
 #include <cg/primitives/triangle.h>
@@ -51,7 +52,7 @@ struct edge
    vertex_p<Scalar> begin;
    edge_p<Scalar>   next;
    edge_p<Scalar>   twin;
-   face_wp<Scalar>  in_face;
+   face_p<Scalar>  in_face;
 
    edge() {}
    edge(vertex_p<Scalar> begin)
@@ -192,6 +193,8 @@ class delaunay_triangulation
    void init_triangulation();
    edge_p<Scalar> localize(point_2t<Scalar> p, std::vector<size_t> & containing);
    void split_up(std::vector<size_t> & containing, edge_p<Scalar> start, vertex_p<Scalar> v);
+   void flip_if(edge_p<Scalar> e);
+   bool non_delaunay(edge_p<Scalar> e);
 
 public:
 
@@ -208,6 +211,7 @@ public:
    }
 
    void add(point_2t<Scalar> p);
+   void flip(edge_p<Scalar> e);
 
    template <class OutIter>
    OutIter triangulate(OutIter out) const
@@ -231,6 +235,53 @@ void delaunay_triangulation<Scalar>::init_triangulation()
    make_twins(e1, e2);
    make_twins(e1->next, e2->next->next);
    make_twins(e2->next, e1->next->next);
+}
+
+template <class Scalar>
+bool delaunay_triangulation<Scalar>::non_delaunay(edge_p<Scalar> e)
+{
+   if (e->contains_inf()) // TODO do this case
+      return false;
+   return cg::in_circle(e->begin->p, e->next->begin->p, e->next->next->begin->p,
+                        e->twin->next->end()->p);
+}
+
+template <class Scalar>
+void delaunay_triangulation<Scalar>::flip(edge_p<Scalar> e)
+{
+   edge_p<Scalar> flipped = boost::make_shared< edge<Scalar> >(e->next->next->begin);
+   edge_p<Scalar> flipped_twin = boost::make_shared< edge<Scalar> >(e->twin->next->next->begin);
+   make_twins(flipped, flipped_twin);
+
+   face_p<Scalar> flip_in = e->in_face;
+   flip_in->side = e->next;
+   e->twin->next->next->in_face = flip_in;
+   flipped->in_face = flip_in;
+
+   face_p<Scalar> twin_flip_in = e->twin->in_face;
+   twin_flip_in->side = e->twin->next;
+   e->next->next->in_face = twin_flip_in;
+   flipped_twin->in_face = twin_flip_in;
+
+   flipped->next = e->twin->next->next;
+   flipped_twin->next = e->next->next;
+
+   e->next->next->next = e->twin->next;
+   e->next->next = flipped;
+   e->twin->next->next->next = e->next;
+   e->twin->next->next = flipped_twin;
+}
+
+template <class Scalar>
+void delaunay_triangulation<Scalar>::flip_if(edge_p<Scalar> e)
+{
+   if (!non_delaunay(e))
+      return;
+   edge_p<Scalar> next1 = e->twin->next;
+   edge_p<Scalar> next2 = next1->next;
+   flip(e);
+   flip_if(next1);
+   flip_if(next2);
 }
 
 // returns edge of chain used in split_up
@@ -268,7 +319,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
 {
    // build up chain
    std::vector< edge_p<Scalar> > chain;
-   if (faces[containing.front()]->contains_inf())
+   if (faces[containing.front()]->contains_inf()) // fix it
    {
       std::cout << "out of convex" << std::endl;
       edge_p<Scalar> curr = start;
@@ -351,6 +402,11 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
       new_edges[i]->in_face = new_faces[i];
       new_edges[i]->twin->in_face = new_faces[(i + ch_length - 1) % ch_length];
       chain[i]->in_face = new_faces[i];
+   }
+
+   for (edge_p<Scalar> e : chain)
+   {
+      flip_if(e);
    }
 }
 
