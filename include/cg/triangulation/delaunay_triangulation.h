@@ -75,6 +75,7 @@ struct face
       for (int i = 0; i < 3; i++)
       {
          edges[i]->in_face = face_p<Scalar>(this);
+         edges[i]->begin->out = edges[i];
       }
       side           = edges[0];
       edges[0]->next = edges[1];
@@ -111,10 +112,11 @@ struct face
       auto curr = side;
       for (int i = 0; i < 3; i++)
       {
-         if (curr->begin->inf || curr->end()->inf)
-            continue;
-         if (cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_RIGHT)
-            return false;
+         if (!curr->begin->inf && !curr->end()->inf)
+         {
+            if (cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_RIGHT)
+               return false;
+         }
          curr = curr->next;
       }
       return true;
@@ -156,7 +158,7 @@ template <class Scalar>
 std::ostream & operator<<(std::ostream & out, const face_p<Scalar> f)
 {
    out << "{face: "     << " " << f->side << " "
-      << f->side->next << " " << f->side->next->next << "}";
+       << f->side->next << " " << f->side->next->next << "}";
    return out;
 }
 
@@ -168,6 +170,8 @@ class delaunay_triangulation
    std::vector< vertex_p<Scalar> > vertices;
 
    void init_triangulation();
+   edge_p<Scalar> localize(point_2t<Scalar> p, std::vector< face_p<Scalar> > containing);
+   void split_up(std::vector< face_p<Scalar> > & containing, edge_p<Scalar> start, vertex_p<Scalar> v);
 
 public:
 
@@ -210,6 +214,43 @@ void delaunay_triangulation<Scalar>::init_triangulation()
    std::cout << faces[0] << std::endl << faces[1] << std::endl;
 }
 
+// returns edge of chain used in split_up
+template <class Scalar>
+edge_p<Scalar> delaunay_triangulation<Scalar>::localize(point_2t<Scalar> p, std::vector< face_p<Scalar> > containing)
+{
+   edge_p<Scalar> start;
+   for (auto i = faces.begin(); i != faces.end(); i++)
+   {
+      bool contains = true;
+      edge_p<Scalar> curr = (*i)->side;
+      for (int j = 0; j < 3; j++)
+      {
+         if (!curr->begin->inf && !curr->end()->inf)
+         {
+            if (cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_RIGHT)
+               contains = false;
+            if (cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_LEFT)
+               start = curr;
+         }
+         curr = curr->next;
+      }
+
+      if (contains)
+      {
+         std::cout << *i << " contains " << p << std::endl;
+         containing.push_back(*i);
+      }
+   }
+   return start;
+}
+
+template <class Scalar>
+void delaunay_triangulation<Scalar>::split_up(std::vector< face_p<Scalar> > & containing,
+                                              edge_p<Scalar> start, vertex_p<Scalar> v)
+{
+
+}
+
 template <class Scalar>
 void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 {
@@ -231,18 +272,9 @@ void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 
    // localization -- O(in faces.size()) here :-(
    std::vector< face_p<Scalar> > containing; // faces that contains added point
-   std::for_each(faces.begin(), faces.end(),
-      [&containing, &p](face_p<Scalar> f)
-         {
-            if (f->contains(p))
-            {
-               std::cout << f << " contains " << p << std::endl;
-               containing.push_back(f);
-            }
-         });
+   edge_p<Scalar> start = localize(p, containing);
 
-   // add new edges in face
-   // for every bad edge in old face recursively fix them
+   split_up(containing, start, v);
 }
 
 
