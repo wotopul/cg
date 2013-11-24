@@ -60,12 +60,14 @@ struct edge
 
    vertex_p<Scalar> end() const { return next->begin; }
 
-   bool operator<(const edge_p<Scalar> rhs) const
+   bool contains_inf() const { return begin->inf || end()->inf; }
+
+   bool operator<(const edge<Scalar> rhs) const
    {
       point_2t<Scalar> a = begin->p;
       point_2t<Scalar> b = next->begin->p;
-      point_2t<Scalar> c = rhs->begin->p;
-      point_2t<Scalar> d = rhs->next->begin->p;
+      point_2t<Scalar> c = rhs.begin->p;
+      point_2t<Scalar> d = rhs.next->begin->p;
       return cg::orientation(a, b, b + (d - c)) == cg::CG_RIGHT;
    }
 };
@@ -113,11 +115,9 @@ struct face
       auto curr = side;
       for (int i = 0; i < 3; i++)
       {
-         if (!curr->begin->inf && !curr->end()->inf)
-         {
-            if (cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_RIGHT)
-               return false;
-         }
+         if (!curr->contains_inf() &&
+             cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_RIGHT)
+            return false;
          curr = curr->next;
       }
       return true;
@@ -231,7 +231,6 @@ void delaunay_triangulation<Scalar>::init_triangulation()
    make_twins(e1, e2);
    make_twins(e1->next, e2->next->next);
    make_twins(e2->next, e1->next->next);
-   std::cout << faces[0] << std::endl << faces[1] << std::endl;
 }
 
 // returns edge of chain used in split_up
@@ -241,19 +240,23 @@ edge_p<Scalar> delaunay_triangulation<Scalar>::localize(point_2t<Scalar> p, std:
    edge_p<Scalar> start;
    for (size_t i = 0; i < faces.size(); i++)
    {
-      if (faces[i]->contains(p))
+      if (!faces[i]->contains(p))
+         continue;
+
+      std::cout << faces[i] << " contains " << p << std::endl;
+      containing.push_back(i);
+      edge_p<Scalar> curr = faces[i]->side;
+      for (int j = 0; j < 3; j++)
       {
-         std::cout << faces[i] << " contains " << p << std::endl;
-         containing.push_back(i);
-         edge_p<Scalar> curr = faces[i]->side;
-         for (int j = 0; j < 3; j++)
+         if (!curr->contains_inf() &&
+             cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_LEFT)
          {
-            if (cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_LEFT)
-            {
-               start = ( start == nullptr ? curr : std::min(start, curr) );
-            }
-            curr = curr->next;
+            if (start == nullptr)
+               start = curr;
+            else if ( (*curr) < (*start) )
+               start = curr;
          }
+         curr = curr->next;
       }
    }
    return start;
@@ -310,6 +313,11 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
       chain.push_back(common->twin->next->next);
    }
 
+   std::cout << "chain: ";
+   for (auto i = chain.begin(); i != chain.end(); i++)
+      std::cout << *i << " ";
+   std::cout << std::endl;
+
    // remove faces
    size_t back = faces.size() - 1;
    for (std::vector<size_t>::reverse_iterator i = containing.rbegin(); i != containing.rend(); i++)
@@ -338,7 +346,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
    {
       new_edges[i]->next = chain[i];
       new_edges[i]->twin->next = new_edges[(i + ch_length - 1) % ch_length];
-      chain[i]->next = new_edges[(i + 1) % chain.size()]->twin;
+      chain[i]->next = new_edges[(i + 1) % ch_length]->twin;
 
       new_edges[i]->in_face = new_faces[i];
       new_edges[i]->twin->in_face = new_faces[(i + ch_length - 1) % ch_length];
@@ -349,6 +357,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
 template <class Scalar>
 void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 {
+   std::cout << "-------------------" << std::endl;
    std::cout << "adding point: " << p << std::endl;
    if (std::any_of(vertices.begin(), vertices.end(), [&p](vertex_p<Scalar> v){ return v->p == p; })) {
       std::cout << "already in cell" << std::endl;
