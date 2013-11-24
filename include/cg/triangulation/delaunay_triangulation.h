@@ -3,7 +3,10 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <memory>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include <cg/operations/orientation.h>
 #include <cg/primitives/point.h>
@@ -192,7 +195,7 @@ public:
    delaunay_triangulation()
    {
       // add inf point
-      vertices.push_back( vertex_p<Scalar>(new vertex<Scalar>()) );
+      vertices.push_back( boost::make_shared< vertex<Scalar> >() );
    }
 
    void clear()
@@ -321,6 +324,33 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
       std::swap(faces[*i], faces[back--]);
    }
    faces.resize(back + 1);
+
+   size_t ch_length = chain.size();
+   std::vector< edge_p<Scalar> > new_edges(ch_length);
+   std::vector< face_p<Scalar> > new_faces(ch_length);
+
+   for (size_t i = 0; i < ch_length; i++)
+   {
+      edge_p<Scalar> new_edge = boost::make_shared< edge<Scalar> >(v);
+      edge_p<Scalar> new_twin = boost::make_shared< edge<Scalar> >(chain[i]->begin);
+      new_faces[i] = boost::make_shared< face<Scalar> >();
+
+      make_twins(new_edge, new_twin);
+      new_edges[i] = new_edge;
+      new_faces[i]->side = new_edges[i];
+      faces.push_back(new_faces[i]);
+   }
+
+   for (size_t i = 0; i < ch_length; i++)
+   {
+      new_edges[i]->next = chain[i];
+      new_edges[i]->twin->next = new_edges[(i + ch_length - 1) % ch_length]; // unsigned?
+      chain[i]->next = new_edges[(i + 1) % chain.size()]->twin;
+
+      new_edges[i]->in_face = new_faces[i];
+      new_edges[i]->twin->in_face = new_faces[(i + ch_length - 1) % ch_length];
+      chain[i]->in_face = new_faces[i];
+   }
 }
 
 template <class Scalar>
