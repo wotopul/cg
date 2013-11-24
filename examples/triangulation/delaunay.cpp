@@ -8,6 +8,7 @@
 #include <cg/primitives/point.h>
 #include <cg/primitives/triangle.h>
 #include <cg/triangulation/delaunay_triangulation.h>
+#include <cg/triangulation/triangulation_predicate.h>
 #include <cg/visualization/viewer_adapter.h>
 #include <cg/visualization/draw_util.h>
 
@@ -19,10 +20,29 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
 {
    delaunay_viewer() {}
 
+   bool check_delaunay(const std::vector<cg::triangle_2> & ans) const
+   {
+      for (cg::triangle_2 tr : ans)
+      {
+         for (cg::triangle_2 p_tr : ans)
+         {
+            for (int i = 0; i < 3; i++)
+            {
+               cg::point_2 p = p_tr[i];
+               if ( tr[0] != p && tr[1] != p && tr[2] != p &&
+                    cg::in_circle(tr[0], tr[1], tr[2], p) )
+                  return false;
+            }
+         }
+      }
+      return true;
+   }
+
    void print(cg::visualization::printer_type & p) const
    {
       p.corner_stream() << "right click: add point" << cg::visualization::endl;
-      p.corner_stream() << "double click: clear" << cg::visualization::endl;
+      //p.corner_stream() << "double click: clear" << cg::visualization::endl;
+      p.corner_stream() << (check_delaunay(answer) ? "OK" : "HE OK") << cg::visualization::endl;
    }
 
    void draw(cg::visualization::drawer_type & drawer) const
@@ -43,6 +63,8 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
       triangulation.add(p);
       answer.clear();
       triangulation.triangulate(std::back_inserter(answer));
+
+
       return true;
    }
 
