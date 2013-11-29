@@ -52,7 +52,7 @@ struct edge
    vertex_p<Scalar> begin;
    edge_p<Scalar>   next;
    edge_p<Scalar>   twin;
-   face_p<Scalar>  in_face;
+   face_p<Scalar>   in_face;
 
    edge() {}
    edge(vertex_p<Scalar> begin)
@@ -101,7 +101,7 @@ struct face
 
    bool contains_inf() const
    {
-      auto curr = side; // a bit of copy-paste here
+      auto curr = side;
       for (int i = 0; i < 3; i++)
       {
          if (curr->begin->inf)
@@ -423,6 +423,7 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
       chain[i]->in_face = new_faces[i];
    }
 
+   // flip bad edges recursively
    for (edge_p<Scalar> e : chain)
    {
       flip_if(e);
