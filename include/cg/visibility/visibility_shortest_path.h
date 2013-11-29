@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cg/primitives/point.h>
+#include <cg/operations/has_intersection/segment_segment.h>
 
 #include <vector>
 #include <algorithm>
