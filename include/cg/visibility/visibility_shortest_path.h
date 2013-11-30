@@ -88,16 +88,17 @@ std::vector< point_2t<Scalar> > shortest_path(const point_2t<Scalar> & s, const 
          {
             d[to] = d[v] + dist;
             parent[to] = v;
-            queue.push(std::make_pair(-d[to], dist));
+            queue.push(std::make_pair(-d[to], to));
          }
       }
    }
-   //
 
+   // constructing path
    std::vector< point_2t<Scalar> > path;
+   path.push_back(f);
    for (int v = finish; parent[v] != -1; v = parent[v])
    {
-      path.push_back( points[v] );
+      path.push_back( points[parent[v]] );
    }
    std::reverse(path.begin(), path.end());
    return std::move(path);

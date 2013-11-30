@@ -106,11 +106,11 @@ std::vector< segment_2t<Scalar> > make_visibility_graph(const point_2t<Scalar> &
 
          for(; last < graph.size(); ++last)
          {
-            std::cout << (graph[last][0] == *pt_iter) << std::endl;
+            //std::cout << (graph[last][0] == *pt_iter) << std::endl;
             if (orientation(*prev, *pt_iter, graph[last][1]) == CG_RIGHT &&
                 orientation(*pt_iter, *next, graph[last][1]) == CG_RIGHT)
             {
-               std::cout << "yes!!!!!!!!!!!!!!!!" << std::endl;
+               //std::cout << "yes!!!!!!!!!!!!!!!!" << std::endl;
                graph.erase(graph.begin() + last);
                --last;
             }
