@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 
 namespace cg
 {
@@ -37,10 +38,11 @@ bool has_intersection(const segment_2t<Scalar> & seg, const std::vector< contour
 }
 
 template <class Scalar>
-void find_visible(const point_2t<Scalar> & p, typename std::vector< contour_2t<Scalar> >::const_iterator p_cont_iter,
+size_t find_visible(const point_2t<Scalar> & p, typename std::vector< contour_2t<Scalar> >::const_iterator p_cont_iter,
                   const std::vector< contour_2t<Scalar> > & polygons,
                   std::back_insert_iterator< std::vector<segment_2t<Scalar>> > out_iter)
 {
+   size_t added = 0;
    for (auto cont_iter = polygons.begin(); cont_iter != polygons.end(); cont_iter++)
    {
       for (auto pt_iter = cont_iter->begin(); pt_iter != cont_iter->end(); pt_iter++)
@@ -71,9 +73,11 @@ void find_visible(const point_2t<Scalar> & p, typename std::vector< contour_2t<S
          if (ok && (p < *pt_iter || p_cont_iter == polygons.end()))
          {
             *out_iter++ = seg;
+            added++;
          }
       }
    }
+   return added;
 }
 
 template <class Scalar>
@@ -86,7 +90,31 @@ std::vector< segment_2t<Scalar> > make_visibility_graph(const point_2t<Scalar> &
    {
       for (auto pt_iter = cont_iter->begin(); pt_iter != cont_iter->end(); pt_iter++)
       {
-         find_visible(*pt_iter, cont_iter, obstacles, std::back_inserter(graph));
+         size_t last = graph.size();
+         size_t added = find_visible(*pt_iter, cont_iter, obstacles, std::back_inserter(graph));
+
+         auto prev = (pt_iter == cont_iter->begin()   ? cont_iter->end() - 1 : std::prev(pt_iter));
+         auto next = (pt_iter == cont_iter->end() - 1 ? cont_iter->begin()   : std::next(pt_iter));
+
+         /*auto end = std::remove_if(graph.end() - added, graph.end(),
+            [=](segment_2t<Scalar> s)
+            {
+               point_2t<Scalar> o = s[1];
+               return orientation(*prev, *pt_iter, o) == CG_RIGHT && orientation(*pt_iter, *next, o) == CG_RIGHT;
+            });
+         graph.resize( graph.size() - std::distance(end, graph.end()) );*/
+
+         for(; last < graph.size(); ++last)
+         {
+            std::cout << (graph[last][0] == *pt_iter) << std::endl;
+            if (orientation(*prev, *pt_iter, graph[last][1]) == CG_RIGHT &&
+                orientation(*pt_iter, *next, graph[last][1]) == CG_RIGHT)
+            {
+               std::cout << "yes!!!!!!!!!!!!!!!!" << std::endl;
+               graph.erase(graph.begin() + last);
+               --last;
+            }
+         }
       }
    }
 
