@@ -37,7 +37,7 @@ bool has_intersection(const segment_2t<Scalar> & seg, const std::vector< contour
 }
 
 template <class Scalar>
-void find_visible(const point_2t<Scalar> & p, typename std::vector< contour_2t<Scalar> >::const_iterator cont_iter,
+void find_visible(const point_2t<Scalar> & p, typename std::vector< contour_2t<Scalar> >::const_iterator p_cont_iter,
                   const std::vector< contour_2t<Scalar> > & polygons,
                   std::back_insert_iterator< std::vector<segment_2t<Scalar>> > out_iter)
 {
@@ -47,9 +47,31 @@ void find_visible(const point_2t<Scalar> & p, typename std::vector< contour_2t<S
       {
          if (p == *pt_iter)
             continue;
-         auto prev = (pt_iter == cont_iter->begin()   ? cont_iter->end() - 1 : std::prev(pt_iter));
-         auto next = (pt_iter == cont_iter->end() - 1 ? cont_iter->begin()   : std::next(pt_iter));
 
+         segment_2t<Scalar> seg(p, *pt_iter);
+         bool ok = !has_intersection(seg, polygons);
+         if (cont_iter == p_cont_iter)
+         {
+            auto prev = (pt_iter == cont_iter->begin()   ? cont_iter->end() - 1 : std::prev(pt_iter));
+            auto next = (pt_iter == cont_iter->end() - 1 ? cont_iter->begin()   : std::next(pt_iter));
+
+            auto first_rotate  = orientation(*prev, *pt_iter, p);
+            auto second_rotate = orientation(*pt_iter, *next, p);
+
+            if (orientation(*prev, *pt_iter, *next) == CG_LEFT)
+            {
+               ok &= (first_rotate != CG_LEFT || second_rotate != CG_LEFT);
+            }
+            else
+            {
+               ok &= (first_rotate != CG_LEFT && second_rotate != CG_LEFT);
+            }
+         }
+
+         if (ok && (p < *pt_iter || p_cont_iter == polygons.end()))
+         {
+            *out_iter++ = seg;
+         }
       }
    }
 }
@@ -59,6 +81,14 @@ std::vector< segment_2t<Scalar> > make_visibility_graph(const point_2t<Scalar> &
                                                         const std::vector< contour_2t<Scalar> > & obstacles)
 {
    std::vector< segment_2t<Scalar> > graph;
+
+   for (auto cont_iter = obstacles.begin(); cont_iter != obstacles.end(); cont_iter++)
+   {
+      for (auto pt_iter = cont_iter->begin(); pt_iter != cont_iter->end(); pt_iter++)
+      {
+         find_visible(*pt_iter, cont_iter, obstacles, std::back_inserter(graph));
+      }
+   }
 
    find_visible(s, obstacles.end(), obstacles, std::back_inserter(graph));
    find_visible(f, obstacles.end(), obstacles, std::back_inserter(graph));
