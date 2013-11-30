@@ -71,7 +71,7 @@ std::vector< point_2t<Scalar> > shortest_path(const point_2t<Scalar> & s, const 
    std::vector<int> parent(size, -1);
 
    std::priority_queue< std::pair<Scalar, int> > queue;
-   queue.push( std::make_pair(d[start], start) );
+   queue.push( std::make_pair(-d[start], start) );
    while (!queue.empty())
    {
       int v = queue.top().second;
