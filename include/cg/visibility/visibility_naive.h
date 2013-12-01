@@ -54,26 +54,26 @@ size_t find_visible(const point_2t<Scalar> & p,
             continue;
 
          segment_2t<Scalar> seg(p, *pt_iter);
-         bool ok = !has_intersection(seg, polygons);
+
+         auto prev = (pt_iter == cont_iter->begin()   ? cont_iter->end() - 1 : std::prev(pt_iter));
+         auto next = (pt_iter == cont_iter->end() - 1 ? cont_iter->begin()   : std::next(pt_iter));
+         if (orientation(*prev, *pt_iter, p) == CG_RIGHT && orientation(*pt_iter, *next, p) == CG_RIGHT)
+            continue;
+
+         bool intersects = has_intersection(seg, polygons);
          if (p_cont_idx && (std::distance(polygons.begin(), cont_iter) == *p_cont_idx))
          {
-            auto prev = (pt_iter == cont_iter->begin()   ? cont_iter->end() - 1 : std::prev(pt_iter));
-            auto next = (pt_iter == cont_iter->end() - 1 ? cont_iter->begin()   : std::next(pt_iter));
+            orientation_t r1 = orientation(*prev, *pt_iter, *next);
+            orientation_t r2 = orientation(*prev, *pt_iter, p);
+            orientation_t r3 = orientation(*pt_iter, *next, p);
 
-            auto first_rotate  = orientation(*prev, *pt_iter, p);
-            auto second_rotate = orientation(*pt_iter, *next, p);
-
-            if (orientation(*prev, *pt_iter, *next) == CG_LEFT)
-            {
-               ok &= (first_rotate != CG_LEFT || second_rotate != CG_LEFT);
-            }
-            else
-            {
-               ok &= (first_rotate != CG_LEFT && second_rotate != CG_LEFT);
-            }
+            if (r1 == CG_LEFT && (r2 == CG_LEFT && r3 == CG_LEFT))
+               continue;
+            if (r1 != CG_LEFT && (r2 == CG_LEFT || r3 == CG_LEFT))
+               continue;
          }
 
-         if (ok && (p < *pt_iter || !p_cont_idx))
+         if (!intersects && (p < *pt_iter || !p_cont_idx))
          {
             *out_iter++ = seg;
             added++;

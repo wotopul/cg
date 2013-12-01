@@ -15,7 +15,7 @@ namespace util
         {}
 
         random_generator() : random_generator(std::numeric_limits<ValueType>::min(),
-                                                  std::numeric_limits<ValueType>::max())
+                                              std::numeric_limits<ValueType>::max())
         {}
 
         ValueType operator() ()

@@ -34,7 +34,6 @@ void insert(point_2t<Scalar> p, std::map< point_2t<Scalar>, int > & indices,
    points.push_back(p);
 }
 
-
 template <class Scalar>
 std::vector< point_2t<Scalar> > shortest_path(const point_2t<Scalar> & s, const point_2t<Scalar> & f,
                                               const std::vector< segment_2t<Scalar> > & edges)
@@ -88,7 +87,7 @@ std::vector< point_2t<Scalar> > shortest_path(const point_2t<Scalar> & s, const 
          {
             d[to] = d[v] + dist;
             parent[to] = v;
-            queue.push(std::make_pair(-d[to], to));
+            queue.push( std::make_pair(-d[to], to) );
          }
       }
    }
