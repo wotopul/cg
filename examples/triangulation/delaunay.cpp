@@ -1,6 +1,8 @@
 #include <QColor>
 #include <QApplication>
 
+#include <cmath>
+#include <random>
 #include <vector>
 #include <algorithm>
 #include <boost/optional.hpp>
@@ -18,7 +20,7 @@ using cg::point_2;
 
 struct delaunay_viewer : cg::visualization::viewer_adapter
 {
-   delaunay_viewer() {}
+   delaunay_viewer() : distribution(0, 359) {}
 
    bool check_delaunay(const std::vector<cg::triangle_2> & ans) const
    {
@@ -31,7 +33,10 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
                cg::point_2 p = p_tr[i];
                if ( tr[0] != p && tr[1] != p && tr[2] != p &&
                     cg::in_circle(tr[0], tr[1], tr[2], p) )
+               {
+                  // std::cerr << p << "lies inside [ " << tr[0] << " " << tr[1] << " " << tr[2] << std::endl;
                   return false;
+               }
             }
          }
       }
@@ -41,7 +46,6 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
    void print(cg::visualization::printer_type & p) const
    {
       p.corner_stream() << "right click: add point" << cg::visualization::endl;
-      //p.corner_stream() << "double click: clear" << cg::visualization::endl;
       p.corner_stream() << (check_delaunay(answer) ? "OK" : "HE OK") << cg::visualization::endl;
    }
 
@@ -63,8 +67,6 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
       triangulation.add(p);
       answer.clear();
       triangulation.triangulate(std::back_inserter(answer));
-
-
       return true;
    }
 
@@ -76,6 +78,9 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
    }
 
 private:
+   std::mt19937 generator;
+   std::uniform_real_distribution<double> distribution;
+
    std::vector<point_2> pts;
    cg::delaunay_triangulation<double> triangulation;
    std::vector<cg::triangle_2> answer;

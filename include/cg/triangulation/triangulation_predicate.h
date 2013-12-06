@@ -6,9 +6,12 @@
 
 #include <boost/optional.hpp>
 
-namespace cg // TODO delete copy-paste
+namespace cg
 {
-
+   enum configuration_t
+   {
+      IN, ON, OUT
+   };
 
    struct in_circle_d
    {
@@ -104,10 +107,10 @@ namespace cg // TODO delete copy-paste
 
    inline bool in_circle(point_2 const& a, point_2 const& b, point_2 const& c, point_2 const& d)
    {
-      if (boost::optional<bool> v = in_circle_d()(a, b, c, d))
+      /*if (boost::optional<bool> v = in_circle_d()(a, b, c, d))
       {
          return *v;
-      }
+      }*/
 
       if (boost::optional<bool> v = in_circle_i()(a, b, c, d))
       {

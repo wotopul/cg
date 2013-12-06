@@ -267,8 +267,9 @@ bool delaunay_triangulation<Scalar>::non_delaunay(edge_p<Scalar> e)
 {
    if (e->contains_inf() || e->twin->next->end()->inf)
       return false;
-   return cg::in_circle(e->begin->p, e->next->begin->p, e->next->next->begin->p,
-                        e->twin->next->end()->p);
+   point_2t<Scalar> a = e->begin->p, b = e->next->begin->p, c = e->next->next->begin->p,
+                    d = e->twin->next->end()->p;
+   return cg::in_circle(a, b, c, d) /*|| cg::in_circle(c, d, b, a)*/;
 }
 
 template <class Scalar>
@@ -302,6 +303,7 @@ void delaunay_triangulation<Scalar>::flip_if(edge_p<Scalar> e)
 {
    if (!non_delaunay(e))
       return;
+   //std::cout << "flipping edge: " << e << std::endl;
    edge_p<Scalar> next1 = e->twin->next;
    edge_p<Scalar> next2 = next1->next;
    flip(e);
@@ -388,6 +390,15 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
       chain.push_back(common->twin->next->next);
    }
 
+   //
+   //std::cout << "chain:" << std::endl;
+   //for (auto e : chain)
+   //{
+   //   std::cout << e << " ";
+   //}
+   //std::cout << std::endl;
+   //
+
    // remove faces
    size_t back = faces.size() - 1;
    for (std::vector<size_t>::reverse_iterator i = containing.rbegin(); i != containing.rend(); i++)
@@ -433,6 +444,10 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
 template <class Scalar>
 void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 {
+   //
+   //std::cout << "---------------------------" << std::endl;
+   //std::cout << "add point: " << p << std::endl;
+   //
    if (std::any_of(vertices.begin(), vertices.end(), [&p](vertex_p<Scalar> v){ return v->p == p; })) {
       return;
    }
@@ -451,7 +466,23 @@ void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
    std::vector<size_t> containing; // faces that contains added point
    edge_p<Scalar> start = localize(p, containing);
 
+   //
+   //std::cout << "lies in faces:" << std::endl;
+   //for (size_t i : containing)
+   //{
+   //   std::cout << faces[i] << std::endl;
+   //}
+   //std::cout << std::endl;
+   //
+
    split_up(containing, start, v);
+
+   //
+   //std::cout << "new faces" << std::endl;
+   //for (auto f : faces) {
+   //   std::cout << f << std::endl;
+   //}
+   //
 }
 
 
