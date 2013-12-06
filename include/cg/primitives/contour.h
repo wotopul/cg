@@ -62,6 +62,11 @@ namespace cg
          pts_.push_back(point);
       }
 
+      void remove_last()
+      {
+         pts_.pop_back();
+      }
+
       point_2t<Scalar> const& operator [] (size_t idx) const
       {
          return pts_[idx];
