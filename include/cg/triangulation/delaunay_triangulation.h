@@ -8,6 +8,9 @@
 #include <boost/make_shared.hpp>
 #include <boost/weak_ptr.hpp>
 
+#include <cg/primitives/segment.h>
+#include <cg/operations/contains/segment_point.h>
+#include <cg/triangulation/cell.h>
 #include <cg/triangulation/triangulation_predicate.h>
 #include <cg/operations/orientation.h>
 #include <cg/primitives/point.h>
@@ -18,172 +21,6 @@ namespace cg
 {
 
 
-template <class Scalar> struct edge;
-template <class Scalar> using edge_p = boost::shared_ptr< edge<Scalar> >;
-template <class Scalar> using edge_wp = boost::weak_ptr< edge<Scalar> >;
-
-template <class Scalar> struct vertex;
-template <class Scalar> using vertex_p = boost::shared_ptr< vertex<Scalar> >;
-template <class Scalar> using vertex_wp = boost::weak_ptr< vertex<Scalar> >;
-
-template <class Scalar> struct face;
-template <class Scalar> using face_p = boost::shared_ptr< face<Scalar> >;
-template <class Scalar> using face_wp = boost::weak_ptr< face<Scalar> >;
-
-template <class Scalar>
-struct vertex
-{
-   bool inf;
-   point_2t<Scalar> p;
-   edge_wp<Scalar> out;
-
-   vertex() : inf(true) {} // construct inf point
-   vertex(point_2t<Scalar> p) : inf(false), p(p)  {}
-
-   bool operator<(const vertex_p<Scalar> rhs) const
-   {
-      return p < rhs->p;
-   }
-};
-
-template <class Scalar>
-struct edge
-{
-   vertex_p<Scalar> begin;
-   edge_p<Scalar>   next;
-   edge_p<Scalar>   twin;
-   face_p<Scalar>   in_face;
-
-   edge() {}
-   edge(vertex_p<Scalar> begin)
-       : begin(begin)
-   {}
-
-   vertex_p<Scalar> end() const { return next->begin; }
-
-   bool contains_inf() const { return begin->inf || end()->inf; }
-
-   bool operator<(const edge<Scalar> rhs) const
-   {
-      point_2t<Scalar> a = begin->p;
-      point_2t<Scalar> b = next->begin->p;
-      point_2t<Scalar> c = rhs.begin->p;
-      point_2t<Scalar> d = rhs.next->begin->p;
-      return cg::orientation(a, b, b + (d - c)) == cg::CG_RIGHT;
-   }
-};
-
-template <class Scalar>
-void make_twins(edge_p<Scalar> e1, edge_p<Scalar> e2)
-{
-   e1->twin = e2;
-   e2->twin = e1;
-}
-
-template <class Scalar>
-struct face
-{
-   edge_p<Scalar> side;
-
-   face() {}
-
-   cg::triangle_2t<Scalar> to_triangle() const
-   {
-      cg::triangle_2t<Scalar> res;
-      auto curr = side;
-      for (int i = 0; i < 3; i++)
-      {
-         res[i] = curr->begin->p;
-         curr = curr->next;
-      }
-      return res;
-   }
-
-   bool contains_inf() const
-   {
-      auto curr = side;
-      for (int i = 0; i < 3; i++)
-      {
-         if (curr->begin->inf)
-            return true;
-         curr = curr->next;
-      }
-      return false;
-   }
-
-   bool contains(point_2t<Scalar> p) const
-   {
-      auto curr = side;
-      for (int i = 0; i < 3; i++)
-      {
-         if (!curr->contains_inf() &&
-             cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_RIGHT)
-            return false;
-         curr = curr->next;
-      }
-      return true;
-   }
-};
-
-template <class Scalar>
-face_p<Scalar> make_face(vertex_p<Scalar> a, vertex_p<Scalar> b, vertex_p<Scalar> c)
-{
-   face_p<Scalar> f = boost::make_shared< face<Scalar> >();
-   edge_p<Scalar> edges[3] = {boost::make_shared< edge<Scalar> >(a),
-                              boost::make_shared< edge<Scalar> >(b),
-                              boost::make_shared< edge<Scalar> >(c)};
-   for (int i = 0; i < 3; i++)
-   {
-      edges[i]->in_face = face_p<Scalar>(f);
-      edges[i]->begin->out = edges[i];
-   }
-   f->side        = edges[0];
-   edges[0]->next = edges[1];
-   edges[1]->next = edges[2];
-   edges[2]->next = f->side;
-   return f;
-}
-
-template <class Scalar>
-struct contains_pred
-{
-   point_2t<Scalar> p;
-
-   contains_pred(point_2t<Scalar> p) : p(p) {}
-   bool operator()(const face_p<Scalar> f)
-   {
-      return f->contains(p);
-   }
-};
-
-
-// logging
-template <class Scalar>
-std::ostream & operator<<(std::ostream & out, const vertex_p<Scalar> v)
-{
-   if (v->inf)
-      out << "inf";
-   else
-      out << "(" << v->p.x << ", " << v->p.y << ")";
-   return out;
-}
-
-template <class Scalar>
-std::ostream & operator<<(std::ostream & out, const edge_p<Scalar> e)
-{
-   out << "[ " << e->begin << ", " << e->end() << " ]";
-   return out;
-}
-
-template <class Scalar>
-std::ostream & operator<<(std::ostream & out, const face_p<Scalar> f)
-{
-   out << "{face: "     << " " << f->side << " "
-       << f->side->next << " " << f->side->next->next << "}";
-   return out;
-}
-
-
 template <class Scalar>
 class delaunay_triangulation
 {
@@ -191,10 +28,15 @@ class delaunay_triangulation
    std::vector< vertex_p<Scalar> > vertices;
 
    void init_triangulation();
-   edge_p<Scalar> localize(point_2t<Scalar> p, std::vector<size_t> & containing);
+
+   void insert(face_p<Scalar> f, vertex_p<Scalar> v);
+   void insert(edge_p<Scalar> common, vertex_p<Scalar> v);
+
+   boost::optional< face_p<Scalar> > find_face(point_2t<Scalar> p);
+   boost::optional< edge_p<Scalar> > find_edge(point_2t<Scalar> p);
+
    void split_up(std::vector<size_t> & containing, edge_p<Scalar> start, vertex_p<Scalar> v);
    void flip_if(edge_p<Scalar> e);
-   bool non_delaunay(edge_p<Scalar> e);
 
    void reset();
 
@@ -263,16 +105,6 @@ void delaunay_triangulation<Scalar>::init_triangulation()
 }
 
 template <class Scalar>
-bool delaunay_triangulation<Scalar>::non_delaunay(edge_p<Scalar> e)
-{
-   if (e->contains_inf() || e->twin->next->end()->inf)
-      return false;
-   point_2t<Scalar> a = e->begin->p, b = e->next->begin->p, c = e->next->next->begin->p,
-                    d = e->twin->next->end()->p;
-   return cg::in_circle(a, b, c, d) /*|| cg::in_circle(c, d, b, a)*/;
-}
-
-template <class Scalar>
 void delaunay_triangulation<Scalar>::flip(edge_p<Scalar> e)
 {
    edge_p<Scalar> flipped = boost::make_shared< edge<Scalar> >(e->next->next->begin);
@@ -303,7 +135,7 @@ void delaunay_triangulation<Scalar>::flip_if(edge_p<Scalar> e)
 {
    if (!non_delaunay(e))
       return;
-   //std::cout << "flipping edge: " << e << std::endl;
+   //std::cerr << "flipping edge: " << e << std::endl;
    edge_p<Scalar> next1 = e->twin->next;
    edge_p<Scalar> next2 = next1->next;
    flip(e);
@@ -311,116 +143,68 @@ void delaunay_triangulation<Scalar>::flip_if(edge_p<Scalar> e)
    flip_if(next2);
 }
 
-// returns edge of chain used in split_up
 template <class Scalar>
-edge_p<Scalar> delaunay_triangulation<Scalar>::localize(point_2t<Scalar> p, std::vector<size_t> & containing)
+boost::optional< face_p<Scalar> > delaunay_triangulation<Scalar>::find_face(point_2t<Scalar> p)
 {
-   edge_p<Scalar> start;
-   for (size_t i = 0; i < faces.size(); i++)
-   {
-      if (!faces[i]->contains(p))
-         continue;
-
-      containing.push_back(i);
-      edge_p<Scalar> curr = faces[i]->side;
-      for (int j = 0; j < 3; j++)
-      {
-         if (!curr->contains_inf() &&
-             cg::orientation(curr->begin->p, curr->end()->p, p) == cg::CG_LEFT)
-         {
-            if (start == nullptr)
-               start = curr;
-            else if ( (*curr) < (*start) )
-               start = curr;
-         }
-         curr = curr->next;
-      }
-   }
-   return start;
+   contains_pred<Scalar> pred(p);
+   auto pos = std::find_if(faces.begin(), faces.end(), pred);
+   if (pos == faces.end())
+      return boost::none;
+   else
+      return *pos;
 }
 
 template <class Scalar>
-void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
-                                              edge_p<Scalar> start, vertex_p<Scalar> v)
+boost::optional< edge_p<Scalar> > delaunay_triangulation<Scalar>::find_edge(point_2t<Scalar> p)
 {
-   // build up chain
-   std::vector< edge_p<Scalar> > chain;
-   if (faces[containing.front()]->contains_inf() && faces[containing.back()]->contains_inf())
+   for (auto f : faces)
    {
-      //std::cout << "out of convex" << std::endl;
-      edge_p<Scalar> curr = start;
-      for (size_t i = 0; i < containing.size() - 1; i++)
-      {
-         chain.push_back(curr);
-         curr = curr->next->twin->next;
-      }
-      chain.push_back(curr);
-      chain.push_back(curr->next);
-      chain.push_back(start->next->next);
-   }
-   else if (containing.size() == 1)
-   {
-      //std::cout << "in convex inside triangle" << std::endl;
-      edge_p<Scalar> curr = faces[containing.front()]->side;
+      edge_p<Scalar> curr = f->side;
       for (int i = 0; i < 3; i++)
       {
-         chain.push_back(curr);
+         if (!curr->contains_inf() &&
+             contains( segment_2t<Scalar>(curr->begin->p, curr->end()->p), p ) )
+         {
+            return curr;
+         }
          curr = curr->next;
       }
    }
-   else
-   {
-      //std::cout << "on edge" << std::endl;
-      edge_p<Scalar> common;
-      auto e1 = faces[containing[0]]->side;
-      for (int i = 0; i < 3; i++)
-      {
-         auto e2 = faces[containing[1]]->side;
-         for (int j = 0; j < 3; j++)
-         {
-            if (e2->twin == e1)
-               common = e1;
-            e2 = e2->next;
-         }
-         e1 = e1->next;
-      }
-      chain.push_back(common->next);
-      chain.push_back(common->next->next);
-      chain.push_back(common->twin->next);
-      chain.push_back(common->twin->next->next);
-   }
+   return boost::none;
+}
 
+template <class Scalar>
+void delaunay_triangulation<Scalar>::insert(face_p<Scalar> f, vertex_p<Scalar> v)
+{
    //
-   //std::cout << "chain:" << std::endl;
-   //for (auto e : chain)
-   //{
-   //   std::cout << e << " ";
-   //}
-   //std::cout << std::endl;
+   //std::cerr << "lies in face " << std::endl;
+   //std::cerr << f << std::endl;
    //
-
-   // remove faces
-   size_t back = faces.size() - 1;
-   for (std::vector<size_t>::reverse_iterator i = containing.rbegin(); i != containing.rend(); i++)
+   std::vector< edge_p<Scalar> > chain;
+   edge_p<Scalar> curr = f->side;
+   for (int i = 0; i < 3; i++)
    {
-      std::swap(faces[*i], faces[back--]);
+      chain.push_back(curr);
+      curr = curr->next;
    }
-   faces.resize(back + 1);
-
    size_t ch_length = chain.size();
    std::vector< edge_p<Scalar> > new_edges(ch_length);
    std::vector< face_p<Scalar> > new_faces(ch_length);
+   new_faces[0] = f;
+   new_faces[1] = boost::make_shared< face<Scalar> >();
+   new_faces[2] = boost::make_shared< face<Scalar> >();
+   faces.push_back(new_faces[1]);
+   faces.push_back(new_faces[2]);
+   //
 
    for (size_t i = 0; i < ch_length; i++)
    {
       edge_p<Scalar> new_edge = boost::make_shared< edge<Scalar> >(v);
       edge_p<Scalar> new_twin = boost::make_shared< edge<Scalar> >(chain[i]->begin);
-      new_faces[i] = boost::make_shared< face<Scalar> >();
 
       make_twins(new_edge, new_twin);
       new_edges[i] = new_edge;
       new_faces[i]->side = new_edges[i];
-      faces.push_back(new_faces[i]);
    }
 
    for (size_t i = 0; i < ch_length; i++)
@@ -434,21 +218,80 @@ void delaunay_triangulation<Scalar>::split_up(std::vector<size_t> & containing,
       chain[i]->in_face = new_faces[i];
    }
 
-   // flip bad edges recursively
    for (edge_p<Scalar> e : chain)
    {
       flip_if(e);
    }
+   //
+   //std::cerr << "new faces" << std::endl;
+   //for (auto f : faces) {
+   //   std::cerr << f << std::endl;
+   //}
+   //
+}
+
+template <class Scalar>
+void delaunay_triangulation<Scalar>::insert(edge_p<Scalar> common, vertex_p<Scalar> v)
+{
+   face_p<Scalar> f1 = common->in_face;
+   face_p<Scalar> f2 = common->twin->in_face;
+   std::vector< edge_p<Scalar> > chain;
+   chain.push_back(common->next);
+   chain.push_back(common->next->next);
+   chain.push_back(common->twin->next);
+   chain.push_back(common->twin->next->next);
+   size_t ch_length = chain.size();
+   std::vector< edge_p<Scalar> > new_edges(ch_length);
+   std::vector< face_p<Scalar> > new_faces(ch_length);
+   new_faces[0] = f1;
+   new_faces[1] = f2;
+   new_faces[2] = boost::make_shared< face<Scalar> >();
+   new_faces[3] = boost::make_shared< face<Scalar> >();
+   faces.push_back(new_faces[2]);
+   faces.push_back(new_faces[3]);
+   //
+
+   for (size_t i = 0; i < ch_length; i++)
+   {
+      edge_p<Scalar> new_edge = boost::make_shared< edge<Scalar> >(v);
+      edge_p<Scalar> new_twin = boost::make_shared< edge<Scalar> >(chain[i]->begin);
+
+      make_twins(new_edge, new_twin);
+      new_edges[i] = new_edge;
+      new_faces[i]->side = new_edges[i];
+   }
+
+   for (size_t i = 0; i < ch_length; i++)
+   {
+      new_edges[i]->next = chain[i];
+      new_edges[i]->twin->next = new_edges[(i + ch_length - 1) % ch_length];
+      chain[i]->next = new_edges[(i + 1) % ch_length]->twin;
+
+      new_edges[i]->in_face = new_faces[i];
+      new_edges[i]->twin->in_face = new_faces[(i + ch_length - 1) % ch_length];
+      chain[i]->in_face = new_faces[i];
+   }
+
+   for (edge_p<Scalar> e : chain)
+   {
+      flip_if(e);
+   }
+   //
+   //std::cerr << "new faces" << std::endl;
+   //for (auto f : faces) {
+   //  std::cerr << f << std::endl;
+   //}
+   //
 }
 
 template <class Scalar>
 void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
 {
    //
-   //std::cout << "---------------------------" << std::endl;
-   //std::cout << "add point: " << p << std::endl;
+   //std::cerr << "---------------------------" << std::endl;
+   //std::cerr << "add point: " << p << std::endl;
    //
-   if (std::any_of(vertices.begin(), vertices.end(), [&p](vertex_p<Scalar> v){ return v->p == p; })) {
+   if (std::any_of(vertices.begin() + 1, vertices.end(), [&p](vertex_p<Scalar> v){ return v->p == p; })) {
       return;
    }
 
@@ -462,27 +305,20 @@ void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
       return;
    }
 
-   // localization -- O(in faces.size()) here :-(
-   std::vector<size_t> containing; // faces that contains added point
-   edge_p<Scalar> start = localize(p, containing);
+   boost::optional< face_p<Scalar> > f = find_face(p);
+   if (f)
+   {
+      insert(*f, v);
+      return;
+   }
 
-   //
-   //std::cout << "lies in faces:" << std::endl;
-   //for (size_t i : containing)
-   //{
-   //   std::cout << faces[i] << std::endl;
-   //}
-   //std::cout << std::endl;
-   //
+   boost::optional< edge_p<Scalar> > e = find_edge(p);
+   if (e)
+   {
+      insert(*e, v);
+      return;
+   }
 
-   split_up(containing, start, v);
-
-   //
-   //std::cout << "new faces" << std::endl;
-   //for (auto f : faces) {
-   //   std::cout << f << std::endl;
-   //}
-   //
 }
 
 

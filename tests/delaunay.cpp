@@ -29,7 +29,7 @@ bool check_delaunay(const std::vector<cg::triangle_2> & ans)
          {
             point_2 p = p_tr[i];
             if ( tr[0] != p && tr[1] != p && tr[2] != p &&
-                 cg::in_circle(tr[0], tr[1], tr[2], p) )
+                 cg::in_circle(tr[0], tr[1], tr[2], p) == cg::CG_IN )
                return false;
          }
       }
@@ -88,24 +88,58 @@ TEST(delaunay, circle)
       tr.triangulate(std::back_inserter(ans));
       EXPECT_TRUE(check_delaunay(ans));
    }
+}
+
+TEST(delaunay, simple_segment)
+{
+   cg::delaunay_triangulation<double> tr;
+   std::vector<cg::triangle_2> ans;
+   tr.add(cg::point_2(0, 0));
+   tr.add(cg::point_2(4, 0));
+   tr.add(cg::point_2(2, 0));
+   tr.add(cg::point_2(3, 0));
+   tr.add(cg::point_2(2, 2));
+   tr.triangulate(std::back_inserter(ans));
    EXPECT_TRUE(check_delaunay(ans));
 }
 
-/*TEST(delaunay, line)
+TEST(delaunay, segment)
 {
-   uniform_random_real<double, std::mt19937> distr(-(1LL << 53), (1LL << 53));
+   cg::delaunay_triangulation<double> tr;
+   const double right = 10.;
+   std::mt19937 generator;
+   std::uniform_real_distribution<double> distribution(0, right - 1);
+   tr.add(cg::point_2(0, 0));
+   tr.add(cg::point_2(right, 0));
 
-   std::vector<cg::point_2> pts = uniform_points(1000);
-   for (size_t l = 0, ln = 1; ln < pts.size(); l = ln++)
+   const int num = 50;
+   for (int i = 0; i < num; i++)
    {
-      cg::point_2 a = pts[l];
-      cg::point_2 b = pts[ln];
-
-      for (size_t k = 0; k != 300; ++k)
-      {
-         double t = distr();
-         cg::point_2 c = a + t * (b - a);
-         EXPECT_EQ(cg::orientation(a, b, c), *cg::orientation_r()(a, b, c));
-      }
+      tr.add(cg::point_2(distribution(generator), 0));
    }
-}*/
+   tr.add(cg::point_2(2, 2));
+
+   std::vector<cg::triangle_2> ans;
+   tr.triangulate(std::back_inserter(ans));
+   EXPECT_TRUE(check_delaunay(ans));
+}
+
+TEST(delaunay, line)
+{
+   cg::delaunay_triangulation<double> tr;
+   const double right = 10.;
+   std::mt19937 generator;
+   std::uniform_real_distribution<double> distribution(0, right - 1);
+   tr.add(cg::point_2(0, 0));
+
+   const int num = 50;
+   for (int i = 0; i < num; i++)
+   {
+      tr.add(cg::point_2(distribution(generator), 0));
+   }
+   tr.add(cg::point_2(2, 2));
+
+   std::vector<cg::triangle_2> ans;
+   tr.triangulate(std::back_inserter(ans));
+   EXPECT_TRUE(check_delaunay(ans));
+}

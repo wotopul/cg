@@ -1,21 +1,27 @@
 #pragma once
 
-#include "cg/primitives/point.h"
-#include <boost/numeric/interval.hpp>
 #include <gmpxx.h>
 
+#include <cg/primitives/point.h>
+#include <cg/triangulation/cell.h>
+
+#include <boost/numeric/interval.hpp>
 #include <boost/optional.hpp>
+
+#include <array>
 
 namespace cg
 {
+
    enum configuration_t
    {
-      IN, ON, OUT
+      CG_IN, CG_ON, CG_OUT
    };
 
    struct in_circle_d
    {
-      boost::optional<bool> operator() (point_2 const& a, point_2 const& b, point_2 const& c, point_2 const& d) const
+      boost::optional<configuration_t> operator() (point_2 const& a, point_2 const& b,
+                                                   point_2 const& c, point_2 const& d) const
       {
          double a11 = a.x - d.x, a12 = a.y - d.y, a13 = (a.x * a.x - d.x * d.x) + (a.y * a.y - d.y * d.y);
          double a21 = b.x - d.x, a22 = b.y - d.y, a23 = (b.x * b.x - d.x * d.x) + (b.y * b.y - d.y * d.y);
@@ -28,12 +34,12 @@ namespace cg
 
          if (res > eps)
          {
-            return true;
+            return CG_IN;
          }
 
          if (res < -eps)
          {
-            return false;
+            return CG_OUT;
          }
 
          return boost::none;
@@ -42,7 +48,8 @@ namespace cg
 
    struct in_circle_i
    {
-      boost::optional<bool> operator() (point_2 const& a, point_2 const& b, point_2 const& c, point_2 const& d) const
+      boost::optional<configuration_t> operator() (point_2 const& a, point_2 const& b,
+                                                   point_2 const& c, point_2 const& d) const
       {
          typedef boost::numeric::interval_lib::unprotect<boost::numeric::interval<double> >::type interval;
 
@@ -60,17 +67,17 @@ namespace cg
 
          if (res.lower() > 0)
          {
-            return true;
+            return CG_IN;
          }
 
          if (res.upper() < 0)
          {
-            return false;
+            return CG_OUT;
          }
 
          if (res.upper() == res.lower())
          {
-            return false; // on border
+            return CG_ON; // ?
          }
 
          return boost::none;
@@ -79,7 +86,8 @@ namespace cg
 
    struct in_circle_r
    {
-      boost::optional<bool> operator() (point_2 const& a, point_2 const& b, point_2 const& c, point_2 const& d) const
+      boost::optional<configuration_t> operator() (point_2 const& a, point_2 const& b,
+                                                   point_2 const& c, point_2 const& d) const
       {
          mpq_class a11 = mpq_class(a.x) - d.x, a12 = mpq_class(a.y) - d.y,
                a13 = (mpq_class(a.x) * a.x - mpq_class(d.x) * d.x) + (mpq_class(a.y) * a.y - mpq_class(d.y) * d.y);
@@ -96,23 +104,25 @@ namespace cg
 
          if (cres > 0)
          {
-            return true;
+            return CG_IN;
          }
-         else
+         else if (cres < 0)
          {
-            return false;
+            return CG_OUT;
          }
+
+         return CG_ON;
       }
    };
 
-   inline bool in_circle(point_2 const& a, point_2 const& b, point_2 const& c, point_2 const& d)
+   inline configuration_t in_circle(point_2 const& a, point_2 const& b, point_2 const& c, point_2 const& d)
    {
       /*if (boost::optional<bool> v = in_circle_d()(a, b, c, d))
       {
          return *v;
       }*/
 
-      if (boost::optional<bool> v = in_circle_i()(a, b, c, d))
+      if (boost::optional<configuration_t > v = in_circle_i()(a, b, c, d))
       {
          return *v;
       }
@@ -121,5 +131,36 @@ namespace cg
 
    }
 
+   template <class Scalar>
+   inline configuration_t in_circle(vertex_p<Scalar> a, vertex_p<Scalar> b,
+                                    vertex_p<Scalar> c, vertex_p<Scalar> d)
+   {
+      if (d->inf)
+         return CG_OUT;
+
+      std::array<vertex_p<Scalar>, 3> f( {{a, b, c}} );
+      bool inf = false;
+      for (int i = 0; i < 3; i++)
+      {
+         if (!f[i]->inf)
+            continue;
+         inf = true;
+         if (orientation(f[(i + 1) % 3]->p, f[(i + 3 - 1) % 3]->p, d->p) == CG_LEFT)
+            return CG_IN;
+      }
+      if (inf)
+         return CG_OUT;
+
+      point_2 ap = a->p, bp = b->p, cp = c->p, dp = d->p;
+      return in_circle(ap, bp, cp, dp);
+
+   }
+
+   template <class Scalar>
+   bool non_delaunay(edge_p<Scalar> e)
+   {
+      vertex_p<Scalar> a = e->begin, b = e->end(), c = e->next->end(), d = e->twin->next->end();
+      return in_circle(a, b, c, d) == CG_IN || in_circle(b, a, d, c) == CG_IN;
+   }
 
 }

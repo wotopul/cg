@@ -32,7 +32,7 @@ struct delaunay_viewer : cg::visualization::viewer_adapter
             {
                cg::point_2 p = p_tr[i];
                if ( tr[0] != p && tr[1] != p && tr[2] != p &&
-                    cg::in_circle(tr[0], tr[1], tr[2], p) )
+                    cg::in_circle(tr[0], tr[1], tr[2], p) == cg::CG_IN )
                {
                   // std::cerr << p << "lies inside [ " << tr[0] << " " << tr[1] << " " << tr[2] << std::endl;
                   return false;
