@@ -37,6 +37,19 @@ bool check_delaunay(const std::vector<cg::triangle_2> & ans)
    return true;
 }
 
+TEST(delaunay, sample0)
+{
+   cg::delaunay_triangulation<double> tr;
+   std::vector<cg::triangle_2> ans;
+   tr.add(cg::point_2(0, 0));
+   tr.add(cg::point_2(1, 0));
+   tr.add(cg::point_2(2, 0));
+   tr.add(cg::point_2(3, 0));
+   tr.add(cg::point_2(2, 2));
+   tr.triangulate(std::back_inserter(ans));
+   EXPECT_TRUE(check_delaunay(ans));
+}
+
 TEST(delaunay, sample)
 {
    std::vector<point_2> pts = boost::assign::list_of(point_2(1, 0))

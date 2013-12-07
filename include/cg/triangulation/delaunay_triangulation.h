@@ -319,6 +319,46 @@ void delaunay_triangulation<Scalar>::add(point_2t<Scalar> p)
       return;
    }
 
+   vertex_p<Scalar> near;
+   if (vertices[1] < v)
+      near = *std::max_element(vertices.begin() + 1, vertices.end() - 1);
+   else
+      near = *std::min_element(vertices.begin() + 1, vertices.end() - 1);
+   vertex_p<Scalar> a = std::min(near, v), b = std::max(near, v);
+
+   std::array<edge_p<Scalar>, 3> upper( {{boost::make_shared< edge<Scalar> >(a),
+                                          boost::make_shared< edge<Scalar> >(b),
+                                          boost::make_shared< edge<Scalar> >(vertices[0])}} );
+   std::array<edge_p<Scalar>, 3> lower( {{boost::make_shared< edge<Scalar> >(b),
+                                          boost::make_shared< edge<Scalar> >(a),
+                                          boost::make_shared< edge<Scalar> >(vertices[0])}} );
+   make_twins(upper[0], lower[0]);
+   make_twins(upper[1], lower[2]);
+   make_twins(upper[2], lower[1]);
+   for (int i = 0; i < 3; i++)
+   {
+      upper[i]->next = upper[(i + 1) % 3];
+      lower[i]->next = lower[(i + 1) % 3];
+   }
+
+   face_p<Scalar> up  = boost::make_shared< face<Scalar> >();
+   face_p<Scalar> low = boost::make_shared< face<Scalar> >();
+   up ->side = upper[0];
+   low->side = lower[0];
+   for (int i = 0; i < 3; i++)
+   {
+      upper[i]->in_face = up;
+      lower[i]->in_face = low;
+   }
+   faces.push_back(up);
+   faces.push_back(low);
+
+   //
+   //std::cerr << "new faces" << std::endl;
+   //for (auto f : faces) {
+   //  std::cerr << f << std::endl;
+   //}
+   //
 }
 
 
